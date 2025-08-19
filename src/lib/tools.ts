@@ -37,7 +37,6 @@ export const tools: Tool[] = [
     href: "/tools/image-converter",
     icon: Image,
     category: "Productive Tools",
-    comingSoon: true,
   },
   {
     title: "Image Resizer",
@@ -45,7 +44,6 @@ export const tools: Tool[] = [
     href: "/tools/image-resizer",
     icon: Scissors,
     category: "Productive Tools",
-    comingSoon: true,
   },
   // Instagram
   {
