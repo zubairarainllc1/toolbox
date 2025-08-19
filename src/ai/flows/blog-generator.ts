@@ -54,7 +54,7 @@ const prompt = ai.definePrompt({
   name: 'generateBlogPostPrompt',
   input: { schema: GenerateBlogPostInputSchema },
   output: { schema: GenerateBlogPostOutputSchema },
-  prompt: `You are an expert content writer and SEO specialist. Generate a well-structured, SEO-friendly, and engaging blog post and its associated SEO metadata based on the following details.
+  prompt: `You are an expert content writer and SEO specialist. Your task is to generate a well-structured, SEO-friendly, and engaging blog post and its associated SEO metadata based on the following details.
 
 **Blog Post Requirements:**
 - Topic: {{{topic}}}
@@ -68,17 +68,19 @@ const prompt = ai.definePrompt({
 - Include bulleted lists where it makes sense to break up content.
 {{/if}}
 
-**Advanced SEO Requirements:**
+**Link Integration Rules (VERY IMPORTANT):**
 {{#if internalLinks}}
-- Internal Links:
+- Internal Links to integrate:
   {{#each internalLinks}}
-  - Anchor Text: "{{text}}", URL: "{{url}}". Context: "{{prompt}}". Weave this link naturally into the content where it makes the most sense based on the context.
+  - You are given this link: URL="{{url}}", Anchor Text="{{text}}". The goal is to place it naturally in the text based on this prompt: "{{prompt}}".
+  - **Critically, you must ONLY insert this link if the context described in the prompt genuinely fits within the article's topic. If it does not fit, DO NOT INCLUDE THE LINK.** Do not force irrelevant links.
   {{/each}}
 {{/if}}
 {{#if externalLinks}}
-- External Links:
+- External Links to integrate:
   {{#each externalLinks}}
-  - Anchor Text: "{{text}}", URL: "{{url}}". Context: "{{prompt}}". Weave this link naturally into the content where it makes the most sense based on the context.
+  - You are given this link: URL="{{url}}", Anchor Text="{{text}}". The goal is to place it naturally in the text based on this prompt: "{{prompt}}".
+  - **Critically, you must ONLY insert this link if the context described in the prompt genuinely fits within the article's topic. If it does not fit, DO NOT INCLUDE THE LINK.** Do not force irrelevant links.
   {{/each}}
 {{/if}}
 
@@ -120,7 +122,7 @@ const prompt = ai.definePrompt({
     {{#if includePoints}}
     - Lists: Use bullet points or numbered lists to present information clearly where appropriate (e.g., for steps, tips, or examples).
     {{/if}}
-    - Linking: Integrate the provided internal and external links using Markdown format like [Anchor Text](URL). The placement should be natural and contextually relevant based on the linking prompts provided.
+    - Linking: Integrate the provided links using Markdown format like [Anchor Text](URL). The placement must be natural and contextually relevant based on the linking prompts provided. **If a link's context does not fit the article, do not include it.**
 
 5. **Keyword Placement Summary:**
     - Title (H1): Once.
@@ -133,9 +135,10 @@ const prompt = ai.definePrompt({
     - A brief summary of the main points.
     - Must include the main keyword "{{{mainKeyword}}}" once.
     {{#if cta}}
-    - Call to Action: Seamlessly integrate the following CTA into the conclusion.
+    - **Call to Action (CTA) Rule:** You must seamlessly integrate the following CTA into the conclusion. The CTA should feel like a natural extension of the blog post's topic, based on the provided prompt.
       - Link: {{{cta.link}}}
-      - Context: {{{cta.prompt}}}
+      - Prompt for CTA context: "{{{cta.prompt}}}"
+      - **Do not make it sound like an advertisement. It must be woven into the concluding paragraph organically.**
     {{/if}}
 
 Return the complete response as a single JSON object with the fields 'blogPost', 'metaTitle', 'metaDescription', and 'permalink'. For the 'blogPost' field, do not add any introductory text before the H1 title.`,
