@@ -14,7 +14,6 @@ import { z } from "zod";
 import { generateInstagramCaptions, GenerateInstagramCaptionsInput } from "@/ai/flows/generate-instagram-captions";
 import { generateFacebookCaptions, GenerateFacebookCaptionsInput } from "@/ai/flows/facebook-caption-generator";
 import { generateXHashtags, GenerateXHashtagsInput } from "@/ai/flows/x-hashtag-generator";
-import { generateTwitterContent, GenerateTwitterContentInput } from "@/ai/flows/generate-twitter-content";
 
 
 const captionSchema = z.object({
@@ -47,12 +46,6 @@ const instagramCaptionSchema = z.object({
 const facebookCaptionSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
   includeEmojis: z.boolean().optional(),
-});
-
-const twitterContentSchema = z.object({
-  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
-  context: z.string().optional(),
-  tweetsQuantity: z.coerce.number().min(1).max(10).default(5),
 });
 
 const youtubeIdeasSchema = z.object({
@@ -238,35 +231,6 @@ export async function handleGenerateFacebookCaptions(prevState: any, formData: F
     console.error(error);
     return {
       message: "Failed to generate captions. Please try again later.",
-    };
-  }
-}
-
-export async function handleGenerateTwitterContent(prevState: any, formData: FormData) {
-  const rawData = {
-    topic: formData.get("topic"),
-    context: formData.get("context"),
-    tweetsQuantity: 5,
-  };
-  
-  const validatedFields = twitterContentSchema.safeParse(rawData);
-
-  if (!validatedFields.success) {
-    return {
-      message: validatedFields.error.errors.map((e) => e.message).join(", "),
-    };
-  }
-
-  try {
-    const result = await generateTwitterContent(validatedFields.data as GenerateTwitterContentInput);
-    return {
-      tweets: result.tweets,
-      hashtags: [],
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      message: "Failed to generate content. Please try again later.",
     };
   }
 }
