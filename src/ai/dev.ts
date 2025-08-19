@@ -13,3 +13,4 @@ import '@/ai/flows/tiktok-content-idea-generator';
 import '@/ai/flows/tiktok-viral-hooks-generator';
 import '@/ai/flows/tiktok-description-generator';
 import '@/ai/flows/youtube-content-idea-generator';
+import '@/ai/flows/tiktok-title-generator';
