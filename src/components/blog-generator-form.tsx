@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Sparkles, Clipboard, Check, PlusCircle, MinusCircle, Copy, CopyCheck, RefreshCw, ChevronDown } from 'lucide-react';
+import { Loader2, Sparkles, Clipboard, Check, PlusCircle, MinusCircle, Copy, CopyCheck, RefreshCw, ChevronDown, FileScan, Bot } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -26,8 +26,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { handleGenerateBlogPost, handleRegenerateMeta } from '@/app/actions';
+import { handleGenerateBlogPost, handleRegenerateMeta, handleParaphraseText } from '@/app/actions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Slider } from './ui/slider';
 import { Checkbox } from './ui/checkbox';
@@ -67,6 +68,17 @@ export default function BlogGeneratorForm() {
   const [isCopyingSections, setIsCopyingSections] = useState(false);
   const [isStickyButtonVisible, setIsStickyButtonVisible] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [plagiarismText, setPlagiarismText] = useState('');
+  const [highlightedSentences, setHighlightedSentences] = useState<string[]>([]);
+  const [isFixingPlagiarism, setIsFixingPlagiarism] = useState(false);
+  const [plagiarismDialogOpen, setPlagiarismDialogOpen] = useState(false);
+
+  const [selection, setSelection] = useState<{ text: string; range: Range | null }>({ text: '', range: null });
+  const [isRegeneratingSelection, setIsRegeneratingSelection] = useState(false);
+  const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
+  const contentRef = useRef<HTMLDivElement>(null);
+
+
   const resultRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -101,22 +113,17 @@ export default function BlogGeneratorForm() {
   
     lines.forEach(line => {
       const trimmedLine = line.trim();
-      // Check if the line is a Markdown heading
       if (trimmedLine.match(/^#+\s/)) {
-        // If there was content before this heading, push it as a section
         if (currentContent.trim()) {
           newSections.push(currentContent.trim());
           currentContent = '';
         }
-        // Push the heading as its own section
         newSections.push(trimmedLine);
       } else {
-        // Append the line to the current content block
         currentContent += line + '\n';
       }
     });
   
-    // Push any remaining content
     if (currentContent.trim()) {
       newSections.push(currentContent.trim());
     }
@@ -218,6 +225,81 @@ export default function BlogGeneratorForm() {
   
   const isLastSection = currentSectionIndex >= sections.length;
 
+  const handleFindPlagiarism = () => {
+    const sentencesToFind = plagiarismText.split('\n').map(s => s.trim()).filter(Boolean);
+    setHighlightedSentences(sentencesToFind);
+    setPlagiarismDialogOpen(false);
+  };
+
+  const handleFixPlagiarism = async () => {
+    if (!result || highlightedSentences.length === 0) return;
+
+    setIsFixingPlagiarism(true);
+    let updatedPost = result.blogPost;
+
+    for (const sentence of highlightedSentences) {
+        try {
+            const response = await handleParaphraseText({ text: sentence });
+            if (response.rewrittenText) {
+                updatedPost = updatedPost.replace(sentence, response.rewrittenText);
+                setResult(prev => ({ ...prev!, blogPost: updatedPost }));
+            } else {
+                toast({ variant: 'destructive', title: 'Error', description: `Could not rewrite: "${sentence}"`});
+            }
+        } catch (e) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Failed to fix plagiarism.'});
+        }
+    }
+    setHighlightedSentences([]);
+    setIsFixingPlagiarism(false);
+    toast({ title: 'Success!', description: 'Plagiarism check complete and text updated.' });
+  };
+
+  const handleMouseUp = useCallback(() => {
+    const currentSelection = window.getSelection();
+    const selectedText = currentSelection?.toString().trim() ?? '';
+  
+    if (selectedText.length > 0 && contentRef.current?.contains(currentSelection?.anchorNode ?? null)) {
+      const range = currentSelection?.getRangeAt(0);
+      if (range) {
+        const rect = range.getBoundingClientRect();
+        setPopoverPosition({
+            top: rect.top + window.scrollY - 40,
+            left: rect.left + window.scrollX + rect.width / 2 - 20,
+        });
+        setSelection({ text: selectedText, range });
+      }
+    } else {
+      setSelection({ text: '', range: null });
+    }
+  }, []);
+
+  const handleRegenerateSelection = async () => {
+    if (!selection.text || !selection.range) return;
+    setIsRegeneratingSelection(true);
+    try {
+        const response = await handleParaphraseText({ text: selection.text });
+        if (response.rewrittenText && result) {
+            const updatedBlog = result.blogPost.replace(selection.text, response.rewrittenText);
+            setResult({ ...result, blogPost: updatedBlog });
+            setSelection({ text: '', range: null });
+        } else {
+            toast({ variant: 'destructive', title: 'Error', description: response.message || 'Failed to rewrite text.' });
+        }
+    } catch (e) {
+        toast({ variant: 'destructive', title: 'Error', description: 'An error occurred during regeneration.'});
+    } finally {
+        setIsRegeneratingSelection(false);
+    }
+  };
+
+
+  useEffect(() => {
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => document.removeEventListener('mouseup', handleMouseUp);
+  }, [handleMouseUp]);
+
+
   useEffect(() => {
     if(isLastSection) {
         setIsCopyingSections(false);
@@ -273,8 +355,7 @@ export default function BlogGeneratorForm() {
                   </FormItem>
                 )}
               />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+              <FormField
                   control={form.control}
                   name="mainKeyword"
                   render={({ field }) => (
@@ -290,31 +371,6 @@ export default function BlogGeneratorForm() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="tone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tone of Voice</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a tone" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="informative">Informative</SelectItem>
-                          <SelectItem value="professional">Professional</SelectItem>
-                          <SelectItem value="casual">Casual</SelectItem>
-                          <SelectItem value="funny">Funny</SelectItem>
-                          <SelectItem value="inspirational">Inspirational</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
 
               {/* Advanced Options Toggle */}
               <div className="relative flex items-center justify-center my-4">
@@ -340,6 +396,30 @@ export default function BlogGeneratorForm() {
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="space-y-8 overflow-hidden"
                 >
+                  <FormField
+                  control={form.control}
+                  name="tone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tone of Voice</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a tone" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="informative">Informative</SelectItem>
+                          <SelectItem value="professional">Professional</SelectItem>
+                          <SelectItem value="casual">Casual</SelectItem>
+                          <SelectItem value="funny">Funny</SelectItem>
+                          <SelectItem value="inspirational">Inspirational</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                   <div>
                     <FormLabel>Related Keywords</FormLabel>
                     <div className="space-y-2 mt-2">
@@ -482,6 +562,35 @@ export default function BlogGeneratorForm() {
                   Generated Blog Post
                 </h3>
                 <div className='flex gap-2'>
+                  <Dialog open={plagiarismDialogOpen} onOpenChange={setPlagiarismDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <FileScan className="mr-2 h-4 w-4" />
+                        Plagiarism
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Plagiarism Checker</DialogTitle>
+                      </DialogHeader>
+                      <div className="flex gap-2">
+                        <div className="flex-shrink-0 text-right text-muted-foreground pt-2">
+                          {plagiarismText.split('\n').map((_, i) => (
+                            <div key={i}>{i+1}</div>
+                          ))}
+                        </div>
+                        <Textarea 
+                          value={plagiarismText} 
+                          onChange={(e) => setPlagiarismText(e.target.value)}
+                          placeholder="Paste text here, one sentence per line..."
+                          rows={10}
+                        />
+                      </div>
+                      <DialogFooter>
+                        <Button onClick={handleFindPlagiarism}>Find Sentences</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                   <Button variant="outline" size="sm" onClick={handleCopyAll}>
                     {copiedAll ? (
                       <Check className="mr-2 h-4 w-4 text-green-500" />
@@ -496,7 +605,11 @@ export default function BlogGeneratorForm() {
                   </Button>
                 </div>
               </div>
-              <div className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none p-6 rounded-md border bg-secondary/50">
+              <div 
+                ref={contentRef}
+                className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none p-6 rounded-md border bg-secondary/50 relative"
+                onMouseUp={handleMouseUp}
+              >
                 {isCopyingSections && sections.length > 0 ? (
                   sections.map((section, index) => (
                     <div
@@ -510,7 +623,32 @@ export default function BlogGeneratorForm() {
                     </div>
                   ))
                 ) : (
-                  <ReactMarkdown>{result.blogPost}</ReactMarkdown>
+                  <ReactMarkdown
+                    components={{
+                        p: ({node, ...props}) => {
+                            const text = node?.children[0]?.type === 'text' ? node.children[0].value : '';
+                            const isHighlighted = highlightedSentences.some(s => text.includes(s));
+                            return <p className={cn(isHighlighted && 'bg-yellow-400/30 rounded-sm')} {...props}/>
+                        },
+                        h1: ({node, ...props}) => {
+                            const text = node?.children[0]?.type === 'text' ? node.children[0].value : '';
+                            const isHighlighted = highlightedSentences.some(s => text.includes(s));
+                            return <h1 className={cn(isHighlighted && 'bg-yellow-400/30 rounded-sm')} {...props}/>
+                        },
+                        h2: ({node, ...props}) => {
+                            const text = node?.children[0]?.type === 'text' ? node.children[0].value : '';
+                            const isHighlighted = highlightedSentences.some(s => text.includes(s));
+                            return <h2 className={cn(isHighlighted && 'bg-yellow-400/30 rounded-sm')} {...props}/>
+                        },
+                         h3: ({node, ...props}) => {
+                            const text = node?.children[0]?.type === 'text' ? node.children[0].value : '';
+                            const isHighlighted = highlightedSentences.some(s => text.includes(s));
+                            return <h3 className={cn(isHighlighted && 'bg-yellow-400/30 rounded-sm')} {...props}/>
+                        },
+                    }}
+                  >
+                    {result.blogPost}
+                  </ReactMarkdown>
                 )}
               </div>
                 <div className="mt-8 flex justify-center">
@@ -531,6 +669,54 @@ export default function BlogGeneratorForm() {
           )}
         </CardContent>
       </Card>
+
+      <AnimatePresence>
+        {selection.text && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.1 }}
+              className="absolute z-10"
+              style={{ top: popoverPosition.top, left: popoverPosition.left }}
+            >
+              <Button
+                size="sm"
+                className="shadow-lg"
+                onClick={handleRegenerateSelection}
+                disabled={isRegeneratingSelection}
+              >
+                {isRegeneratingSelection ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Bot className="mr-2 h-4 w-4" />
+                )}
+                Regenerate
+              </Button>
+            </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {highlightedSentences.length > 0 && (
+           <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed bottom-4 right-4 z-50"
+          >
+            <Button onClick={handleFixPlagiarism} className="shadow-lg" disabled={isFixingPlagiarism}>
+                {isFixingPlagiarism ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="mr-2 h-4 w-4" />
+                )}
+              {isFixingPlagiarism ? 'Fixing...' : `Regenerate ${highlightedSentences.length} sentences`}
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isCopyingSections && isStickyButtonVisible && (

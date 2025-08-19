@@ -40,7 +40,7 @@ const prompt = ai.definePrompt({
   name: 'generateBlogPostPrompt',
   input: { schema: GenerateBlogPostInputSchema },
   output: { schema: GenerateBlogPostOutputSchema },
-  prompt: `You are an expert content writer and SEO specialist. Your task is to generate a well-structured, SEO-friendly, and engaging blog post and its associated SEO metadata based on the following details.
+  prompt: `You are an expert content writer and SEO specialist. Your task is to generate a well-structured, SEO-friendly, and engaging blog post and its associated SEO metadata based on the following details. The blog post must be completely unique and pass plagiarism checks. If you use information from sources, you must rewrite it in your own unique wording.
 
 **Blog Post Requirements:**
 - Topic: {{{topic}}}

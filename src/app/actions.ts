@@ -22,6 +22,7 @@ import { generateYoutubeTitle, GenerateYoutubeTitleInput } from "@/ai/flows/yout
 import { generateTikTokVideoIdeas, GenerateTikTokVideoIdeasInput } from "@/ai/flows/tiktok-video-idea-generator";
 import { generateBlogPost, GenerateBlogPostInput, GenerateBlogPostOutput } from "@/ai/flows/blog-generator";
 import { regenerateMeta, RegenerateMetaInput, RegenerateMetaOutput } from "@/ai/flows/regenerate-meta-flow";
+import { paraphraseText, ParaphraseTextInput, ParaphraseTextOutput } from "@/ai/flows/paraphrase-text-flow";
 
 
 const captionSchema = z.object({
@@ -108,6 +109,10 @@ const blogPostSchema = z.object({
 const regenerateMetaSchema = z.object({
   topic: z.string().min(10, 'Please enter a topic with at least 10 characters.'),
   mainKeyword: z.string().min(3, 'Please enter a main keyword.'),
+});
+
+const paraphraseTextSchema = z.object({
+  text: z.string().min(3, 'Please provide some text to paraphrase.'),
 });
 
 
@@ -545,6 +550,30 @@ export async function handleGenerateYoutubeContentIdeas(
         metaTitle: '',
         metaDescription: '',
         permalink: ''
+      };
+    }
+  }
+
+  export async function handleParaphraseText(
+    input: ParaphraseTextInput
+  ): Promise<ParaphraseTextOutput & { message?: string }> {
+    const validatedFields = paraphraseTextSchema.safeParse(input);
+  
+    if (!validatedFields.success) {
+      return {
+        message: validatedFields.error.errors.map((e) => e.message).join(', '),
+        rewrittenText: '',
+      };
+    }
+  
+    try {
+      const result = await paraphraseText(validatedFields.data);
+      return result;
+    } catch (error) {
+      console.error(error);
+      return {
+        message: 'Failed to paraphrase text. Please try again later.',
+        rewrittenText: '',
       };
     }
   }
