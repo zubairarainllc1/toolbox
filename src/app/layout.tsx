@@ -18,13 +18,13 @@ export const metadata: Metadata = {
     "A collection of powerful tools for social media, productivity, and more. Generate hashtags, captions, and optimize your workflow.",
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon/favicon.ico', sizes: 'any' },
+      { url: '/favicon/favicon.svg', type: 'image/svg+xml' },
     ],
-    apple: '/apple-touch-icon.png',
-    shortcut: '/favicon-16x16.png'
+    apple: '/favicon/apple-touch-icon.png',
+    shortcut: '/favicon/favicon-16x16.png'
   },
-  manifest: '/site.webmanifest',
+  manifest: '/favicon/site.webmanifest',
 };
 
 export default function RootLayout({
