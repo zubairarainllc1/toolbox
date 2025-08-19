@@ -6,10 +6,10 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/toaster";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  variable: "--font-headline",
 });
 
 export const metadata: Metadata = {
@@ -18,13 +18,13 @@ export const metadata: Metadata = {
     "A collection of powerful tools for social media, productivity, and more. Generate hashtags, captions, and optimize your workflow.",
   icons: {
     icon: [
-      { url: '/favicon/favicon.ico', sizes: 'any' },
-      { url: '/favicon/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
     ],
-    apple: '/favicon/apple-touch-icon.png',
-    shortcut: '/favicon/favicon-16x16.png'
+    apple: '/apple-touch-icon.png',
+    shortcut: '/favicon-16x16.png'
   },
-  manifest: '/favicon/site.webmanifest',
+  manifest: '/site.webmanifest',
 };
 
 export default function RootLayout({
