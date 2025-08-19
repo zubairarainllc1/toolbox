@@ -101,7 +101,7 @@ export const tools: Tool[] = [
   },
   // Facebook
   {
-    title: "Facebook Post Caption",
+    title: "Facebook Caption Generator",
     description: "Generate compelling posts to engage your audience.",
     href: "/tools/facebook-post-generator",
     icon: Type,
