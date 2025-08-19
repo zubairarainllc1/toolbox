@@ -17,3 +17,4 @@ import '@/ai/flows/tiktok-title-generator';
 import '@/ai/flows/youtube-title-generator';
 import '@/ai/flows/tiktok-video-idea-generator';
 import '@/ai/flows/blog-generator';
+import '@/ai/flows/regenerate-meta-flow';

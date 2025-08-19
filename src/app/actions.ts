@@ -20,7 +20,8 @@ import { generateYoutubeContentIdeas, GenerateYoutubeContentIdeasInput } from "@
 import { generateTikTokContentIdeas, GenerateTikTokContentIdeasInput } from "@/ai/flows/tiktok-content-idea-generator";
 import { generateYoutubeTitle, GenerateYoutubeTitleInput } from "@/ai/flows/youtube-title-generator";
 import { generateTikTokVideoIdeas, GenerateTikTokVideoIdeasInput } from "@/ai/flows/tiktok-video-idea-generator";
-import { generateBlogPost, GenerateBlogPostInput } from "@/ai/flows/blog-generator";
+import { generateBlogPost, GenerateBlogPostInput, GenerateBlogPostOutput } from "@/ai/flows/blog-generator";
+import { regenerateMeta, RegenerateMetaInput, RegenerateMetaOutput } from "@/ai/flows/regenerate-meta-flow";
 
 
 const captionSchema = z.object({
@@ -101,6 +102,11 @@ const blogPostSchema = z.object({
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']),
   wordCount: z.coerce.number().min(600).max(2500),
   includePoints: z.boolean().optional(),
+});
+
+const regenerateMetaSchema = z.object({
+  topic: z.string().min(10, 'Please enter a topic with at least 10 characters.'),
+  mainKeyword: z.string().min(3, 'Please enter a main keyword.'),
 });
 
 
@@ -486,24 +492,58 @@ export async function handleGenerateYoutubeContentIdeas(
 
   export async function handleGenerateBlogPost(
     input: GenerateBlogPostInput
-  ): Promise<{ blogPost?: string; message?: string }> {
+  ): Promise<GenerateBlogPostOutput & { message?: string }> {
     const validatedFields = blogPostSchema.safeParse(input);
   
     if (!validatedFields.success) {
       return {
         message: validatedFields.error.errors.map((e) => e.message).join(', '),
+        blogPost: '',
+        metaTitle: '',
+        metaDescription: '',
+        permalink: ''
       };
     }
   
     try {
       const result = await generateBlogPost(validatedFields.data);
-      return {
-        blogPost: result.blogPost,
-      };
+      return result;
     } catch (error) {
       console.error(error);
       return {
         message: 'Failed to generate blog post. Please try again later.',
+        blogPost: '',
+        metaTitle: '',
+        metaDescription: '',
+        permalink: ''
+      };
+    }
+  }
+  
+  export async function handleRegenerateMeta(
+    input: RegenerateMetaInput
+  ): Promise<RegenerateMetaOutput & { message?: string }> {
+    const validatedFields = regenerateMetaSchema.safeParse(input);
+  
+    if (!validatedFields.success) {
+      return {
+        message: validatedFields.error.errors.map((e) => e.message).join(', '),
+        metaTitle: '',
+        metaDescription: '',
+        permalink: ''
+      };
+    }
+  
+    try {
+      const result = await regenerateMeta(validatedFields.data);
+      return result;
+    } catch (error) {
+      console.error(error);
+      return {
+        message: 'Failed to regenerate metadata. Please try again later.',
+        metaTitle: '',
+        metaDescription: '',
+        permalink: ''
       };
     }
   }

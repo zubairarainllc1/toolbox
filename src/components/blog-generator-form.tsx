@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Sparkles, Clipboard, Check, PlusCircle, MinusCircle, Copy, CopyCheck } from 'lucide-react';
+import { Loader2, Sparkles, Clipboard, Check, PlusCircle, MinusCircle, Copy, CopyCheck, RefreshCw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -27,11 +27,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { handleGenerateBlogPost } from '@/app/actions';
+import { handleGenerateBlogPost, handleRegenerateMeta } from '@/app/actions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Slider } from './ui/slider';
 import { Checkbox } from './ui/checkbox';
 import { cn } from '@/lib/utils';
+import { Textarea } from './ui/textarea';
 
 const formSchema = z.object({
   topic: z
@@ -46,10 +47,18 @@ const formSchema = z.object({
   includePoints: z.boolean().default(false).optional(),
 });
 
+type ResultState = {
+  blogPost: string;
+  metaTitle: string;
+  metaDescription: string;
+  permalink: string;
+}
+
 export default function BlogGeneratorForm() {
   const { toast } = useToast();
-  const [result, setResult] = useState<string | null>(null);
+  const [result, setResult] = useState<ResultState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRegeneratingMeta, setIsRegeneratingMeta] = useState(false);
   const [copiedAll, setCopiedAll] = useState(false);
   const [sections, setSections] = useState<string[]>([]);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
@@ -85,23 +94,24 @@ export default function BlogGeneratorForm() {
     const lines = blogPost.split('\n');
     const newSections: string[] = [];
     let currentContent = '';
-  
+
     lines.forEach(line => {
-      if (line.match(/^#+\s/)) { // This is a heading
+      const trimmedLine = line.trim();
+      if (trimmedLine.match(/^#+\s/)) { // This is a heading
         if (currentContent.trim()) {
           newSections.push(currentContent.trim());
         }
-        newSections.push(line.trim());
+        newSections.push(trimmedLine);
         currentContent = '';
       } else {
         currentContent += line + '\n';
       }
     });
-  
+
     if (currentContent.trim()) {
       newSections.push(currentContent.trim());
     }
-  
+
     return newSections;
   };
 
@@ -109,16 +119,16 @@ export default function BlogGeneratorForm() {
     setIsLoading(true);
     setResult(null);
     resetCopyState();
-    
+
     const submissionData = {
-        ...values,
-        relatedKeywords: values.relatedKeywords.map(kw => kw.value)
+      ...values,
+      relatedKeywords: values.relatedKeywords.map(kw => kw.value)
     };
 
     try {
       const response = await handleGenerateBlogPost(submissionData);
       if (response.blogPost) {
-        setResult(response.blogPost);
+        setResult(response);
         setSections(parseSections(response.blogPost));
       } else if (response.message) {
         toast({
@@ -139,28 +149,64 @@ export default function BlogGeneratorForm() {
     }
   }
 
+  async function onRegenerateMeta() {
+    const { topic, mainKeyword } = form.getValues();
+    if (!topic || !mainKeyword) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Topic and Main Keyword are required to regenerate metadata.',
+      });
+      return;
+    }
+
+    setIsRegeneratingMeta(true);
+    try {
+      const response = await handleRegenerateMeta({ topic, mainKeyword });
+      if (response.metaTitle && result) {
+        setResult(prev => ({ ...prev!, ...response }));
+        toast({ description: 'SEO Metadata has been regenerated!' });
+      } else if (response.message) {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: response.message,
+        });
+      }
+    } catch (e) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to regenerate metadata. Please try again.',
+      });
+      console.error(e);
+    } finally {
+      setIsRegeneratingMeta(false);
+    }
+  }
+
   const copyToClipboard = (text: string, message: string) => {
     navigator.clipboard.writeText(text);
     toast({ description: message });
   };
 
   const handleCopyAll = () => {
-    if (!result) return;
-    copyToClipboard(result, 'Blog post copied to clipboard!');
+    if (!result?.blogPost) return;
+    copyToClipboard(result.blogPost, 'Blog post copied to clipboard!');
     setCopiedAll(true);
     setTimeout(() => setCopiedAll(false), 2000);
   };
-  
+
   const handleCopySection = () => {
     if (sections.length === 0) return;
     if (!isCopyingSections) setIsCopyingSections(true);
 
     const sectionToCopy = sections[currentSectionIndex];
     copyToClipboard(sectionToCopy, `Section ${currentSectionIndex + 1} copied!`);
-    
+
     setCurrentSectionIndex((prevIndex) => (prevIndex + 1) % sections.length);
   };
-  
+
   useEffect(() => {
     const handleScroll = () => {
       if (resultRef.current) {
@@ -274,7 +320,7 @@ export default function BlogGeneratorForm() {
                           >
                             <MinusCircle className="h-5 w-5 text-red-500" />
                           </Button>
-                           <FormMessage />
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -314,7 +360,7 @@ export default function BlogGeneratorForm() {
                   </FormItem>
                 )}
               />
-               <FormField
+              <FormField
                 control={form.control}
                 name="includePoints"
                 render={({ field }) => (
@@ -329,8 +375,8 @@ export default function BlogGeneratorForm() {
                       <FormLabel>
                         Include Bullet Points
                       </FormLabel>
-                       <p className="text-sm text-muted-foreground">
-                         Add lists and bullet points in the blog post where appropriate.
+                      <p className="text-sm text-muted-foreground">
+                        Add lists and bullet points in the blog post where appropriate.
                       </p>
                     </div>
                   </FormItem>
@@ -360,8 +406,32 @@ export default function BlogGeneratorForm() {
               <p className="text-sm text-muted-foreground">This may take up to a minute. Please wait.</p>
             </div>
           )}
-          {result && (
+          {result && !isLoading && (
             <div className="mt-8" ref={resultRef}>
+              <Card className="bg-secondary/50 mb-6">
+                <CardHeader>
+                  <CardTitle className="text-xl">SEO Metadata</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-1">
+                    <Label htmlFor="meta-title" className="text-xs text-muted-foreground">Meta Title</Label>
+                    <Input id="meta-title" readOnly value={result.metaTitle} />
+                  </div>
+                   <div className="space-y-1">
+                    <Label htmlFor="meta-desc" className="text-xs text-muted-foreground">Meta Description</Label>
+                    <Textarea id="meta-desc" readOnly value={result.metaDescription} rows={3} />
+                  </div>
+                   <div className="space-y-1">
+                    <Label htmlFor="permalink" className="text-xs text-muted-foreground">Permalink</Label>
+                    <Input id="permalink" readOnly value={result.permalink} />
+                  </div>
+                  <Button variant="outline" size="sm" onClick={onRegenerateMeta} disabled={isRegeneratingMeta}>
+                    {isRegeneratingMeta ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+                    Regenerate
+                  </Button>
+                </CardContent>
+              </Card>
+
               <div className="flex flex-wrap gap-2 justify-between items-center mb-4">
                 <h3 className="font-headline text-2xl font-semibold">
                   Generated Blog Post
@@ -375,19 +445,19 @@ export default function BlogGeneratorForm() {
                     )}
                     {copiedAll ? 'Copied!' : 'Copy All'}
                   </Button>
-                   <Button variant="outline" size="sm" onClick={handleCopySection} disabled={sections.length === 0}>
+                  <Button variant="outline" size="sm" onClick={handleCopySection} disabled={sections.length === 0}>
                     <Copy className="mr-2 h-4 w-4" />
                     Copy Section by Section
                   </Button>
                 </div>
               </div>
               <div className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none p-6 rounded-md border bg-secondary/50">
-                 {isCopyingSections && sections.length > 0 ? (
+                {isCopyingSections && sections.length > 0 ? (
                   sections.map((section, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className={cn(
-                        "transition-all duration-300 rounded-md p-2 -m-2", 
+                        "transition-all duration-300 rounded-md p-2 -m-2",
                         isCopyingSections && currentSectionIndex === index && "ring-2 ring-primary/50 bg-primary/5"
                       )}
                     >
@@ -395,17 +465,17 @@ export default function BlogGeneratorForm() {
                     </div>
                   ))
                 ) : (
-                  <ReactMarkdown>{result}</ReactMarkdown>
+                  <ReactMarkdown>{result.blogPost}</ReactMarkdown>
                 )}
               </div>
             </div>
           )}
         </CardContent>
       </Card>
-      
+
       <AnimatePresence>
         {isCopyingSections && isStickyButtonVisible && (
-           <motion.div
+          <motion.div
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -100, opacity: 0 }}

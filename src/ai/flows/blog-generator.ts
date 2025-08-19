@@ -23,6 +23,9 @@ export type GenerateBlogPostInput = z.infer<typeof GenerateBlogPostInputSchema>;
 
 const GenerateBlogPostOutputSchema = z.object({
   blogPost: z.string().describe('The full generated blog post content, formatted in Markdown.'),
+  metaTitle: z.string().describe('An SEO-optimized meta title, around 50-60 characters.'),
+  metaDescription: z.string().describe('An SEO-optimized meta description, around 150-160 characters.'),
+  permalink: z.string().describe('A URL-friendly permalink/slug for the blog post.'),
 });
 export type GenerateBlogPostOutput = z.infer<typeof GenerateBlogPostOutputSchema>;
 
@@ -36,7 +39,7 @@ const prompt = ai.definePrompt({
   name: 'generateBlogPostPrompt',
   input: { schema: GenerateBlogPostInputSchema },
   output: { schema: GenerateBlogPostOutputSchema },
-  prompt: `You are an expert content writer and SEO specialist. Generate a well-structured, SEO-friendly, and engaging blog post based on the following details.
+  prompt: `You are an expert content writer and SEO specialist. Generate a well-structured, SEO-friendly, and engaging blog post and its associated SEO metadata based on the following details.
 
 **Blog Post Requirements:**
 - Topic: {{{topic}}}
@@ -50,8 +53,21 @@ const prompt = ai.definePrompt({
 - Include bulleted lists where it makes sense to break up content.
 {{/if}}
 
-**Strict SEO Structure to Follow:**
+**SEO Metadata Requirements:**
+1. **Meta Title:**
+   - Must include the main keyword: "{{{mainKeyword}}}".
+   - Should be concise and catchy, around 50-60 characters.
+   - Use power words or numbers to attract clicks.
+2. **Meta Description:**
+   - Must include the main keyword: "{{{mainKeyword}}}".
+   - Should be a compelling summary, around 150-160 characters.
+   - Encourage click-throughs.
+3. **Permalink:**
+   - Create a URL-friendly slug from the topic.
+   - Use lowercase letters and hyphens instead of spaces.
+   - Example: "best-seo-blog-structure-2025"
 
+**Strict SEO Blog Structure to Follow:**
 1.  **Title (H1):**
     - Must be clear, catchy, and include the main keyword: "{{{mainKeyword}}}".
     - Example Format: "Best SEO Blog Structure: Rank on Google in 2025"
@@ -87,7 +103,7 @@ const prompt = ai.definePrompt({
     - A brief summary of the main points.
     - Must include the main keyword "{{{mainKeyword}}}" once.
 
-Return the complete blog post as a single Markdown string in the 'blogPost' field of the JSON output. Do not add any introductory text before the H1 title.`,
+Return the complete response as a single JSON object with the fields 'blogPost', 'metaTitle', 'metaDescription', and 'permalink'. For the 'blogPost' field, do not add any introductory text before the H1 title.`,
 });
 
 
