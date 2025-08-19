@@ -11,7 +11,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateCaptionInputSchema = z.object({
-  postDescription: z.string().describe('A brief description of the social media post.'),
+  topic: z.string().describe('The topic or keyword for the social media post.'),
 });
 export type GenerateCaptionInput = z.infer<typeof GenerateCaptionInputSchema>;
 
@@ -28,9 +28,9 @@ const prompt = ai.definePrompt({
   name: 'generateCaptionPrompt',
   input: {schema: GenerateCaptionInputSchema},
   output: {schema: GenerateCaptionOutputSchema},
-  prompt: `You are a social media expert. Generate 5 distinct and engaging captions for the following social media post description.
+  prompt: `You are an expert social media copywriter. Generate 5 distinct and engaging Instagram captions for a post about the following topic.
 
-Description: {{{postDescription}}}
+Topic: {{{topic}}}
 
 Return the captions as a JSON array of strings. Do not include any intro or explanation text. Just return the JSON.`, 
 });

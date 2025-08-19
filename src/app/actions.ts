@@ -14,7 +14,7 @@ import { generateInstagramHashtags, GenerateInstagramHashtagsInput } from "@/ai/
 import { z } from "zod";
 
 const captionSchema = z.object({
-  postDescription: z.string().min(3, "Please provide a longer description."),
+  topic: z.string().min(3, "Please provide a longer topic."),
 });
 
 const instagramBioSchema = z.object({
@@ -50,7 +50,7 @@ const tiktokVideoIdeasSchema = z.object({
 
 export async function handleGenerateCaption(prevState: any, formData: FormData) {
   const validatedFields = captionSchema.safeParse({
-    postDescription: formData.get("postDescription"),
+    topic: formData.get("topic"),
   });
 
   if (!validatedFields.success) {

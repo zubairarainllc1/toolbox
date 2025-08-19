@@ -4,10 +4,11 @@ import { useActionState, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { handleGenerateCaption } from "@/app/actions";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Clipboard } from "lucide-react";
+import { Clipboard, Type, Sparkles } from "lucide-react";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 const initialState = {
   captions: [],
@@ -19,6 +20,7 @@ function SubmitButton() {
   return (
     <Button type="submit" disabled={pending} className="w-full">
       {pending ? "Generating..." : "Generate Captions"}
+      <Sparkles className="ml-2 h-4 w-4" />
     </Button>
   );
 }
@@ -54,16 +56,20 @@ export default function CaptionGeneratorForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-headline text-xl">Describe Your Post</CardTitle>
+        <CardTitle className="font-headline text-xl">Generate Captions</CardTitle>
+        <CardDescription>Enter a topic or keyword to get started.</CardDescription>
       </CardHeader>
       <CardContent>
         <form ref={formRef} action={formAction} className="space-y-6">
-          <Textarea
-            name="postDescription"
-            placeholder="e.g., A beautiful sunset over the ocean with vibrant colors."
-            required
-            rows={4}
-          />
+          <div className="space-y-2">
+            <Label htmlFor="topic">Topic / Keyword</Label>
+            <Input
+              id="topic"
+              name="topic"
+              placeholder="e.g., Summer vacation, new product launch"
+              required
+            />
+          </div>
           <SubmitButton />
         </form>
 
