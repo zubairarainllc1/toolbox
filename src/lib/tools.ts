@@ -81,7 +81,7 @@ export const tools: Tool[] = [
   {
     title: "Instagram Caption Generator",
     description: "Create engaging captions to boost your post performance.",
-    href: "/tools/caption-generator",
+    href: "/tools/instagram-caption-generator",
     icon: Type,
     category: "Instagram",
   },
@@ -103,7 +103,7 @@ export const tools: Tool[] = [
   {
     title: "Facebook Caption Generator",
     description: "Generate compelling posts to engage your audience.",
-    href: "/tools/facebook-post-generator",
+    href: "/tools/facebook-caption-generator",
     icon: Type,
     category: "Facebook",
   },

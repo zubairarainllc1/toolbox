@@ -1,12 +1,12 @@
-import FacebookPostGeneratorForm from "@/components/facebook-post-generator-form";
-import { Type } from "lucide-react";
+import FacebookCaptionGeneratorForm from "@/components/facebook-caption-generator-form";
+import { Facebook } from "lucide-react";
 
-export default function FacebookPostGeneratorPage() {
+export default function FacebookCaptionGeneratorPage() {
   return (
     <div className="container mx-auto px-4 py-12 md:px-6">
       <div className="flex flex-col items-center text-center">
         <div className="flex items-center gap-3 mb-6">
-          <Type className="h-10 w-10 text-primary" />
+          <Facebook className="h-10 w-10 text-primary" />
           <h1 className="text-4xl font-bold font-headline sm:text-5xl">
             Facebook Caption Generator
           </h1>
@@ -17,7 +17,7 @@ export default function FacebookPostGeneratorPage() {
       </div>
 
       <div className="mx-auto mt-12 max-w-2xl">
-        <FacebookPostGeneratorForm />
+        <FacebookCaptionGeneratorForm />
       </div>
     </div>
   );
