@@ -89,7 +89,7 @@ export async function handleGenerateCaption(prevState: any, formData: FormData) 
   try {
     const result = await generateCaption(validatedFields.data as GenerateCaptionInput);
     return {
-      caption: result.caption,
+      captions: result.captions,
     };
   } catch (error) {
     console.error(error);
@@ -115,7 +115,7 @@ export async function handleGenerateInstagramBio(prevState: any, formData: FormD
   try {
     const result = await generateInstagramBio(validatedFields.data as GenerateInstagramBioInput);
     return {
-      bio: result.bio,
+      bios: result.bios,
     };
   } catch (error) {
     return {

@@ -19,7 +19,7 @@ const GenerateInstagramBioInputSchema = z.object({
 export type GenerateInstagramBioInput = z.infer<typeof GenerateInstagramBioInputSchema>;
 
 const GenerateInstagramBioOutputSchema = z.object({
-  bio: z.string().describe('A generated Instagram bio.'),
+  bios: z.array(z.string()).describe('An array of 5 generated Instagram bios.'),
 });
 export type GenerateInstagramBioOutput = z.infer<typeof GenerateInstagramBioOutputSchema>;
 
@@ -31,13 +31,13 @@ const prompt = ai.definePrompt({
   name: 'generateInstagramBioPrompt',
   input: {schema: GenerateInstagramBioInputSchema},
   output: {schema: GenerateInstagramBioOutputSchema},
-  prompt: `You are an expert social media profile writer. Create a compelling Instagram bio based on the following details. The bio should be a maximum of 150 characters.
+  prompt: `You are an expert social media profile writer. Create 5 distinct and compelling Instagram bios based on the following details. Each bio should be a maximum of 150 characters.
 
 Description: {{{description}}}
 Keywords: {{{keywords}}}
 Tone: {{{tone}}}
 
-Bio:`,
+Return the bios as a JSON array of strings. Do not include any intro or explanation text. Just return the JSON.`,
 });
 
 const generateInstagramBioFlow = ai.defineFlow(

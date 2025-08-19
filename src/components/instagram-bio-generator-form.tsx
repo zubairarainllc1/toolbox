@@ -1,21 +1,19 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { handleGenerateInstagramBio } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Bot, Clipboard, ClipboardCheck } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { Clipboard } from "lucide-react";
 import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 const initialState = {
-  bio: "",
+  bios: [],
   message: "",
 };
 
@@ -23,7 +21,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="w-full">
-      {pending ? "Generating..." : "Generate Bio"}
+      {pending ? "Generating..." : "Generate Bios"}
     </Button>
   );
 }
@@ -32,7 +30,6 @@ export default function InstagramBioGeneratorForm() {
   const [state, formAction] = useActionState(handleGenerateInstagramBio, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (state.message) {
@@ -42,23 +39,19 @@ export default function InstagramBioGeneratorForm() {
         description: state.message,
       });
     }
-    if (state.bio) {
+    if (state.bios && state.bios.length > 0) {
       toast({
         title: "Success!",
-        description: "Your new bio has been generated.",
+        description: "Your new bios have been generated.",
       });
     }
   }, [state, toast]);
 
-  const handleCopy = () => {
-    if (state.bio) {
-      navigator.clipboard.writeText(state.bio);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast({
-        description: "Bio copied to clipboard.",
-      });
-    }
+  const copyBio = (bio: string) => {
+    navigator.clipboard.writeText(bio);
+    toast({
+      description: "Bio copied to clipboard.",
+    });
   };
 
   return (
@@ -105,25 +98,23 @@ export default function InstagramBioGeneratorForm() {
           <SubmitButton />
         </form>
 
-        {state.bio && (
+        {state.bios && state.bios.length > 0 && (
           <div className="mt-8">
-            <Alert>
-              <Bot className="h-4 w-4" />
-              <AlertTitle className="font-headline flex items-center justify-between">
-                Generated Bio
-                <Button variant="ghost" size="icon" onClick={handleCopy}>
-                  {copied ? (
-                    <ClipboardCheck className="h-4 w-4" />
-                  ) : (
+            <h3 className="font-headline text-lg font-semibold mb-4">Generated Bios:</h3>
+            <ul className="space-y-3">
+              {state.bios.map((bio: string, index: number) => (
+                 <li
+                  key={index}
+                  className="flex items-center justify-between gap-3 p-3 rounded-md border bg-secondary/50"
+                >
+                  <span className="text-sm">{bio}</span>
+                  <Button variant="ghost" size="icon" onClick={() => copyBio(bio)}>
                     <Clipboard className="h-4 w-4" />
-                  )}
-                  <span className="sr-only">Copy bio</span>
-                </Button>
-              </AlertTitle>
-              <AlertDescription className="pt-2">
-                <Textarea readOnly value={state.bio} rows={4} className="mt-2 text-base"/>
-              </AlertDescription>
-            </Alert>
+                    <span className="sr-only">Copy bio</span>
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </CardContent>

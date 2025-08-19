@@ -1,17 +1,16 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { handleGenerateCaption } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { AlertCircle, Bot, Clipboard, ClipboardCheck } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { Clipboard } from "lucide-react";
 
 const initialState = {
-  caption: "",
+  captions: [],
   message: "",
 };
 
@@ -19,7 +18,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="w-full">
-      {pending ? "Generating..." : "Generate Caption"}
+      {pending ? "Generating..." : "Generate Captions"}
     </Button>
   );
 }
@@ -28,7 +27,6 @@ export default function CaptionGeneratorForm() {
   const [state, formAction] = useActionState(handleGenerateCaption, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (state.message) {
@@ -38,23 +36,19 @@ export default function CaptionGeneratorForm() {
         description: state.message,
       });
     }
-    if (state.caption) {
+    if (state.captions && state.captions.length > 0) {
       toast({
         title: "Success!",
-        description: "Your new caption has been generated.",
+        description: "Your new captions have been generated.",
       });
     }
   }, [state, toast]);
 
-  const handleCopy = () => {
-    if (state.caption) {
-      navigator.clipboard.writeText(state.caption);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast({
-        description: "Caption copied to clipboard.",
-      });
-    }
+  const copyCaption = (caption: string) => {
+    navigator.clipboard.writeText(caption);
+    toast({
+      description: "Caption copied to clipboard.",
+    });
   };
 
   return (
@@ -73,25 +67,23 @@ export default function CaptionGeneratorForm() {
           <SubmitButton />
         </form>
 
-        {state.caption && (
+        {state.captions && state.captions.length > 0 && (
           <div className="mt-8">
-            <Alert>
-              <Bot className="h-4 w-4" />
-              <AlertTitle className="font-headline flex items-center justify-between">
-                Generated Caption
-                <Button variant="ghost" size="icon" onClick={handleCopy}>
-                  {copied ? (
-                    <ClipboardCheck className="h-4 w-4" />
-                  ) : (
+            <h3 className="font-headline text-lg font-semibold mb-4">Generated Captions:</h3>
+            <ul className="space-y-3">
+              {state.captions.map((caption: string, index: number) => (
+                <li
+                  key={index}
+                  className="flex items-center justify-between gap-3 p-3 rounded-md border bg-secondary/50"
+                >
+                  <span className="text-sm">{caption}</span>
+                  <Button variant="ghost" size="icon" onClick={() => copyCaption(caption)}>
                     <Clipboard className="h-4 w-4" />
-                  )}
-                  <span className="sr-only">Copy caption</span>
-                </Button>
-              </AlertTitle>
-              <AlertDescription className="pt-2">
-                <Textarea readOnly value={state.caption} rows={5} className="mt-2 text-base"/>
-              </AlertDescription>
-            </Alert>
+                    <span className="sr-only">Copy caption</span>
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </CardContent>

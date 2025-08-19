@@ -16,7 +16,7 @@ const GenerateCaptionInputSchema = z.object({
 export type GenerateCaptionInput = z.infer<typeof GenerateCaptionInputSchema>;
 
 const GenerateCaptionOutputSchema = z.object({
-  caption: z.string().describe('An engaging caption for the social media post.'),
+  captions: z.array(z.string()).describe('An array of 5 engaging captions for the social media post.'),
 });
 export type GenerateCaptionOutput = z.infer<typeof GenerateCaptionOutputSchema>;
 
@@ -28,11 +28,11 @@ const prompt = ai.definePrompt({
   name: 'generateCaptionPrompt',
   input: {schema: GenerateCaptionInputSchema},
   output: {schema: GenerateCaptionOutputSchema},
-  prompt: `You are a social media expert. Generate an engaging caption for the following social media post description:
+  prompt: `You are a social media expert. Generate 5 distinct and engaging captions for the following social media post description.
 
 Description: {{{postDescription}}}
 
-Caption:`, 
+Return the captions as a JSON array of strings. Do not include any intro or explanation text. Just return the JSON.`, 
 });
 
 const generateCaptionFlow = ai.defineFlow(
