@@ -66,3 +66,14 @@ h1, h2, h3, h4, h5, h6 {
     min-height: 100vh;
   }
 }
+
+@layer components {
+  .gradient-border-button {
+    @apply relative inline-flex items-center justify-center p-0.5 overflow-hidden text-sm font-medium rounded-lg;
+  }
+  .gradient-border-button::before {
+    content: '';
+    @apply absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-to-r from-primary via-blue-400 to-purple-500 animate-gradient;
+    background-size: 300% 300%;
+  }
+}

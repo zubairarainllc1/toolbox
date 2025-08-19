@@ -21,11 +21,13 @@ export default function Home() {
             </p>
             <div className="mt-12 flex flex-col items-center gap-4">
               <ToolSearch />
-               <Link href="/tools">
-                  <Button>
-                    Explore All Tools
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+               <Link href="/tools" className="group gradient-border-button">
+                  <span className="relative px-4 py-2 transition-all ease-in duration-75 bg-background rounded-md group-hover:bg-opacity-0">
+                    <span className="relative flex items-center text-foreground text-sm font-medium">
+                      Explore All Tools
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </span>
+                  </span>
                 </Link>
             </div>
           </div>
