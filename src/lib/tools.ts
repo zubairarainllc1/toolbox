@@ -108,7 +108,7 @@ export const tools: Tool[] = [
     category: "Facebook",
   },
   {
-    title: "Facebook Post Generator",
+    title: "Facebook Post Caption",
     description: "Generate compelling posts to engage your audience.",
     href: "/tools/facebook-post-generator",
     icon: Type,
