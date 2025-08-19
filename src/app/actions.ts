@@ -5,14 +5,13 @@ import {
   GenerateCaptionInput,
 } from "@/ai/flows/caption-generator";
 import { generateInstagramBio, GenerateInstagramBioInput } from "@/ai/flows/instagram-bio-generator";
-import { generateYoutubeTitle } from "@/ai/flows/youtube-title-generator";
-import { generateTikTokVideoIdeas } from "@/ai/flows/tiktok-video-idea-generator";
 import { generateInstagramHashtags, GenerateInstagramHashtagsInput } from "@/ai/flows/instagram-hashtag-generator";
 import { generateFacebookHashtags, GenerateFacebookHashtagsInput } from "@/ai/flows/facebook-hashtag-generator";
 import { z } from "zod";
 import { generateInstagramCaptions, GenerateInstagramCaptionsInput } from "@/ai/flows/generate-instagram-captions";
 import { generateFacebookCaptions, GenerateFacebookCaptionsInput } from "@/ai/flows/facebook-caption-generator";
 import { generateXHashtags, GenerateXHashtagsInput } from "@/ai/flows/x-hashtag-generator";
+import { generateXTweets, GenerateXTweetsInput } from "@/ai/flows/x-tweet-generator";
 
 
 const captionSchema = z.object({
@@ -47,12 +46,9 @@ const facebookCaptionSchema = z.object({
   includeEmojis: z.boolean().optional(),
 });
 
-const youtubeTitleSchema = z.object({
-  description: z.string().min(10, "Please provide a longer description."),
-});
-
-const tiktokVideoIdeasSchema = z.object({
-  topic: z.string().min(3, "Please provide a topic."),
+const xTweetSchema = z.object({
+  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
+  context: z.string().optional(),
 });
 
 
@@ -230,32 +226,10 @@ export async function handleGenerateFacebookCaptions(prevState: any, formData: F
   }
 }
 
-export async function handleGenerateYoutubeTitle(prevState: any, formData: FormData) {
-  const validatedFields = youtubeTitleSchema.safeParse({
-    description: formData.get("description"),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      message: validatedFields.error.errors.map((e) => e.message).join(", "),
-    };
-  }
-
-  try {
-    const result = await generateYoutubeTitle(validatedFields.data.description);
-    return {
-      titles: result.titles,
-    };
-  } catch (error) {
-    return {
-      message: "Failed to generate titles. Please try again later.",
-    };
-  }
-}
-
-export async function handleGenerateTikTokVideoIdeas(prevState: any, formData: FormData) {
-  const validatedFields = tiktokVideoIdeasSchema.safeParse({
+export async function handleGenerateXTweets(prevState: any, formData: FormData) {
+  const validatedFields = xTweetSchema.safeParse({
     topic: formData.get("topic"),
+    context: formData.get("context"),
   });
 
   if (!validatedFields.success) {
@@ -265,13 +239,14 @@ export async function handleGenerateTikTokVideoIdeas(prevState: any, formData: F
   }
 
   try {
-    const result = await generateTikTokVideoIdeas(validatedFields.data.topic);
+    const result = await generateXTweets(validatedFields.data as GenerateXTweetsInput);
     return {
-      ideas: result.ideas,
+      tweets: result.tweets,
     };
   } catch (error) {
+    console.error(error);
     return {
-      message: "Failed to generate ideas. Please try again later.",
+      message: "Failed to generate tweets. Please try again later.",
     };
   }
 }
