@@ -79,13 +79,6 @@ export const tools: Tool[] = [
   },
   // Instagram
   {
-    title: "Instagram Hashtag Generator",
-    description: "Generate trending hashtags for your Instagram posts.",
-    href: "/tools/instagram-hashtag-generator",
-    icon: Hash,
-    category: "Instagram",
-  },
-  {
     title: "Instagram Caption Generator",
     description: "Create engaging captions to boost your post performance.",
     href: "/tools/caption-generator",

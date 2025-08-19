@@ -2,7 +2,6 @@ import { config } from 'dotenv';
 config();
 
 import '@/ai/flows/caption-generator.ts';
-import '@/ai/flows/instagram-hashtag-generator.ts';
 import '@/ai/flows/instagram-bio-generator';
 import '@/ai/flows/facebook-post-generator';
 import '@/ai/flows/x-content-ideas-generator';

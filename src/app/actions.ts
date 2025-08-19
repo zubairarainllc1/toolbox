@@ -4,7 +4,6 @@ import {
   generateCaption,
   GenerateCaptionInput,
 } from "@/ai/flows/caption-generator";
-import { generateInstagramHashtags } from "@/ai/flows/instagram-hashtag-generator";
 import { generateInstagramBio, GenerateInstagramBioInput } from "@/ai/flows/instagram-bio-generator";
 import { generateFacebookPost, GenerateFacebookPostInput } from "@/ai/flows/facebook-post-generator";
 import { generateXContentIdeas } from "@/ai/flows/x-content-ideas-generator";
@@ -12,10 +11,6 @@ import { generateYoutubeIdeas } from "@/ai/flows/youtube-idea-generator";
 import { generateYoutubeTitle } from "@/ai/flows/youtube-title-generator";
 import { generateTikTokVideoIdeas } from "@/ai/flows/tiktok-video-idea-generator";
 import { z } from "zod";
-
-const hashtagSchema = z.object({
-  description: z.string().min(3, "Please provide a longer description."),
-});
 
 const captionSchema = z.object({
   postDescription: z.string().min(3, "Please provide a longer description."),
@@ -46,30 +41,6 @@ const youtubeTitleSchema = z.object({
 const tiktokVideoIdeasSchema = z.object({
   topic: z.string().min(3, "Please provide a topic."),
 });
-
-
-export async function handleGenerateHashtags(prevState: any, formData: FormData) {
-  const validatedFields = hashtagSchema.safeParse({
-    description: formData.get("description"),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      message: validatedFields.error.errors.map((e) => e.message).join(", "),
-    };
-  }
-
-  try {
-    const result = await generateInstagramHashtags(validatedFields.data.description);
-    return {
-      hashtags: result.hashtags,
-    };
-  } catch (error) {
-    return {
-      message: "Failed to generate hashtags. Please try again later.",
-    };
-  }
-}
 
 
 export async function handleGenerateCaption(prevState: any, formData: FormData) {
