@@ -11,6 +11,7 @@ import { generateYoutubeTitle } from "@/ai/flows/youtube-title-generator";
 import { generateTikTokVideoIdeas } from "@/ai/flows/tiktok-video-idea-generator";
 import { generateInstagramHashtags, GenerateInstagramHashtagsInput } from "@/ai/flows/instagram-hashtag-generator";
 import { z } from "zod";
+import { generateInstagramCaptions, GenerateInstagramCaptionsInput } from "@/ai/flows/generate-instagram-captions";
 
 const captionSchema = z.object({
   topic: z.string().min(3, "Please provide a longer topic."),
@@ -25,6 +26,12 @@ const instagramBioSchema = z.object({
 const instagramHashtagSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
 });
+
+const instagramCaptionSchema = z.object({
+  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
+  includeEmojis: z.boolean().optional(),
+});
+
 
 const xContentIdeasSchema = z.object({
   topic: z.string().min(3, "Please provide a topic."),
@@ -113,6 +120,31 @@ export async function handleGenerateInstagramHashtags(prevState: any, formData: 
     console.error(error);
     return {
       message: "Failed to generate hashtags. Please try again later.",
+    };
+  }
+}
+
+export async function handleGenerateInstagramCaptions(prevState: any, formData: FormData) {
+  const validatedFields = instagramCaptionSchema.safeParse({
+    topic: formData.get("topic"),
+    includeEmojis: formData.get("includeEmojis") === 'on',
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: validatedFields.error.errors.map((e) => e.message).join(", "),
+    };
+  }
+
+  try {
+    const result = await generateInstagramCaptions(validatedFields.data as GenerateInstagramCaptionsInput);
+    return {
+      captions: result.captions,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: "Failed to generate captions. Please try again later.",
     };
   }
 }
