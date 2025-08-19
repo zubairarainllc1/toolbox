@@ -11,6 +11,17 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
+const LinkSchema = z.object({
+  url: z.string().url(),
+  text: z.string(),
+  prompt: z.string(),
+});
+
+const CTASchema = z.object({
+  link: z.string().url(),
+  prompt: z.string(),
+});
+
 const GenerateBlogPostInputSchema = z.object({
   topic: z.string().describe('The main topic for the blog post.'),
   mainKeyword: z.string().describe('The primary SEO keyword for the blog post.'),
@@ -18,6 +29,9 @@ const GenerateBlogPostInputSchema = z.object({
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']).describe('The desired tone for the blog post.'),
   wordCount: z.number().min(600).max(2500).describe('The desired word count for the blog post.'),
   includePoints: z.boolean().optional().describe('Whether or not to include bullet points in the blog post.'),
+  internalLinks: z.array(LinkSchema).optional().describe('A list of internal links to include in the blog post.'),
+  externalLinks: z.array(LinkSchema).optional().describe('A list of external, high-authority links to include.'),
+  cta: CTASchema.optional().describe('A call-to-action to include in the conclusion.'),
 });
 export type GenerateBlogPostInput = z.infer<typeof GenerateBlogPostInputSchema>;
 
@@ -51,6 +65,20 @@ const prompt = ai.definePrompt({
 - Word Count: Approximately {{{wordCount}}} words.
 {{#if includePoints}}
 - Include bulleted lists where it makes sense to break up content.
+{{/if}}
+
+**Advanced SEO Requirements:**
+{{#if internalLinks}}
+- Internal Links:
+  {{#each internalLinks}}
+  - Anchor Text: "{{text}}", URL: "{{url}}". Context: "{{prompt}}". Weave this link naturally into the content where it makes the most sense based on the context.
+  {{/each}}
+{{/if}}
+{{#if externalLinks}}
+- External Links:
+  {{#each externalLinks}}
+  - Anchor Text: "{{text}}", URL: "{{url}}". Context: "{{prompt}}". Weave this link naturally into the content where it makes the most sense based on the context.
+  {{/each}}
 {{/if}}
 
 **SEO Metadata Requirements:**
@@ -91,6 +119,7 @@ const prompt = ai.definePrompt({
     {{#if includePoints}}
     - Lists: Use bullet points or numbered lists to present information clearly where appropriate (e.g., for steps, tips, or examples).
     {{/if}}
+    - Linking: Integrate the provided internal and external links using Markdown format like [Anchor Text](URL). The placement should be natural and contextually relevant.
 
 5. **Keyword Placement Summary:**
     - Title (H1): Once.
@@ -102,6 +131,11 @@ const prompt = ai.definePrompt({
 6.  **Conclusion:**
     - A brief summary of the main points.
     - Must include the main keyword "{{{mainKeyword}}}" once.
+    {{#if cta}}
+    - Call to Action: Seamlessly integrate the following CTA into the conclusion.
+      - Link: {{{cta.link}}}
+      - Context: {{{cta.prompt}}}
+    {{/if}}
 
 Return the complete response as a single JSON object with the fields 'blogPost', 'metaTitle', 'metaDescription', and 'permalink'. For the 'blogPost' field, do not add any introductory text before the H1 title.`,
 });

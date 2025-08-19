@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Sparkles, Clipboard, Check, PlusCircle, MinusCircle, Copy, CopyCheck, RefreshCw } from 'lucide-react';
+import { Loader2, Sparkles, Clipboard, Check, PlusCircle, MinusCircle, Copy, CopyCheck, RefreshCw, ChevronDown, Link, ExternalLink } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -34,6 +34,7 @@ import { Checkbox } from './ui/checkbox';
 import { cn } from '@/lib/utils';
 import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
+import { Separator } from './ui/separator';
 
 const formSchema = z.object({
   topic: z
@@ -46,6 +47,20 @@ const formSchema = z.object({
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']),
   wordCount: z.number().min(600).max(2500),
   includePoints: z.boolean().default(false).optional(),
+  internalLinks: z.array(z.object({ 
+    url: z.string().url({ message: "Invalid URL for internal link." }),
+    text: z.string().min(1, { message: "Anchor text for internal link is required." }),
+    prompt: z.string().min(1, { message: "Prompt for internal link is required." }),
+  })).max(10),
+  externalLinks: z.array(z.object({
+    url: z.string().url({ message: "Invalid URL for external link." }),
+    text: z.string().min(1, { message: "Anchor text for external link is required." }),
+    prompt: z.string().min(1, { message: "Prompt for external link is required." }),
+  })).max(10),
+  cta: z.object({
+    link: z.string().url({ message: "Invalid URL for CTA." }),
+    prompt: z.string().min(1, { message: "Prompt for CTA is required." }),
+  }).optional(),
 });
 
 type ResultState = {
@@ -65,6 +80,7 @@ export default function BlogGeneratorForm() {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [isCopyingSections, setIsCopyingSections] = useState(false);
   const [isStickyButtonVisible, setIsStickyButtonVisible] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -76,6 +92,9 @@ export default function BlogGeneratorForm() {
       tone: 'informative',
       wordCount: 1000,
       includePoints: false,
+      internalLinks: [],
+      externalLinks: [],
+      cta: { link: '', prompt: '' },
     },
   });
 
@@ -83,6 +102,16 @@ export default function BlogGeneratorForm() {
     control: form.control,
     name: "relatedKeywords",
   });
+
+  const { fields: internalLinkFields, append: appendInternalLink, remove: removeInternalLink } = useFieldArray({
+    control: form.control,
+    name: "internalLinks",
+  });
+  const { fields: externalLinkFields, append: appendExternalLink, remove: removeExternalLink } = useFieldArray({
+    control: form.control,
+    name: "externalLinks",
+  });
+
 
   const resetCopyState = () => {
     setCopiedAll(false);
@@ -92,27 +121,33 @@ export default function BlogGeneratorForm() {
   };
 
   const parseSections = (blogPost: string) => {
-    const lines = blogPost.split('\n');
+    const lines = blogPost.split('\n').filter(line => line.trim() !== '');
     const newSections: string[] = [];
+  
     let currentContent = '';
-
+  
     lines.forEach(line => {
       const trimmedLine = line.trim();
-      if (trimmedLine.match(/^#+\s/)) { // This is a heading
+      // Check if the line is a Markdown heading
+      if (trimmedLine.match(/^#+\s/)) {
+        // If there was content before this heading, push it as a section
         if (currentContent.trim()) {
           newSections.push(currentContent.trim());
+          currentContent = '';
         }
+        // Push the heading as its own section
         newSections.push(trimmedLine);
-        currentContent = '';
       } else {
+        // Append the line to the current content block
         currentContent += line + '\n';
       }
     });
-
+  
+    // Push any remaining content
     if (currentContent.trim()) {
       newSections.push(currentContent.trim());
     }
-
+  
     return newSections;
   };
 
@@ -120,10 +155,14 @@ export default function BlogGeneratorForm() {
     setIsLoading(true);
     setResult(null);
     resetCopyState();
+    
+    // Filter out empty CTA
+    const cta = (values.cta?.link && values.cta?.prompt) ? values.cta : undefined;
 
     const submissionData = {
       ...values,
-      relatedKeywords: values.relatedKeywords.map(kw => kw.value)
+      relatedKeywords: values.relatedKeywords.map(kw => kw.value),
+      cta: cta
     };
 
     try {
@@ -205,8 +244,16 @@ export default function BlogGeneratorForm() {
     const sectionToCopy = sections[currentSectionIndex];
     copyToClipboard(sectionToCopy, `Section ${currentSectionIndex + 1} copied!`);
 
-    setCurrentSectionIndex((prevIndex) => (prevIndex + 1) % sections.length);
+    setCurrentSectionIndex((prevIndex) => (prevIndex + 1));
   };
+  
+  const isLastSection = currentSectionIndex >= sections.length;
+
+  useEffect(() => {
+    if(isLastSection) {
+        setIsCopyingSections(false);
+    }
+  }, [isLastSection]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -384,6 +431,68 @@ export default function BlogGeneratorForm() {
                 )}
               />
 
+              {/* Advanced Options Toggle */}
+              <div className="relative flex items-center justify-center my-4">
+                <Separator className="flex-1" />
+                <Button 
+                    type="button" 
+                    variant="ghost" 
+                    className="mx-4 flex items-center gap-2" 
+                    onClick={() => setShowAdvanced(!showAdvanced)}>
+                  Advanced Options
+                  <ChevronDown className={cn("h-4 w-4 transition-transform", showAdvanced && "rotate-180")} />
+                </Button>
+                <Separator className="flex-1" />
+              </div>
+
+              {/* Advanced Options Section */}
+              <AnimatePresence>
+              {showAdvanced && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: 'auto' }}
+                  exit={{ opacity: 0, y: -20, height: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="space-y-8 overflow-hidden"
+                >
+                  {/* Internal Links */}
+                  <div className="space-y-4 rounded-md border p-4">
+                    <h3 className="font-medium flex items-center gap-2"><Link className="h-4 w-4" /> Internal Links</h3>
+                    {internalLinkFields.map((field, index) => (
+                      <div key={field.id} className="p-3 bg-secondary/50 rounded-md space-y-2 relative">
+                        <FormField control={form.control} name={`internalLinks.${index}.url`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="URL (e.g. https://yoursite.com/page)" /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name={`internalLinks.${index}.text`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="Anchor Text (e.g. check out our services)" /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name={`internalLinks.${index}.prompt`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="AI Prompt (e.g. place this link after discussing marketing)" /></FormControl><FormMessage /></FormItem>)} />
+                        <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1" onClick={() => removeInternalLink(index)}><MinusCircle className="h-5 w-5 text-red-500" /></Button>
+                      </div>
+                    ))}
+                    {internalLinkFields.length < 10 && <Button type="button" variant="outline" size="sm" onClick={() => appendInternalLink({ url: '', text: '', prompt: '' })}><PlusCircle className="mr-2 h-4 w-4" />Add Internal Link</Button>}
+                  </div>
+
+                  {/* External Links */}
+                  <div className="space-y-4 rounded-md border p-4">
+                    <h3 className="font-medium flex items-center gap-2"><ExternalLink className="h-4 w-4" /> External Links</h3>
+                    {externalLinkFields.map((field, index) => (
+                      <div key={field.id} className="p-3 bg-secondary/50 rounded-md space-y-2 relative">
+                        <FormField control={form.control} name={`externalLinks.${index}.url`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="URL (e.g. https://moz.com/blog)" /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name={`externalLinks.${index}.text`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="Anchor Text (e.g. according to Moz)" /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name={`externalLinks.${index}.prompt`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="AI Prompt (e.g. link this when citing statistics)" /></FormControl><FormMessage /></FormItem>)} />
+                        <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1" onClick={() => removeExternalLink(index)}><MinusCircle className="h-5 w-5 text-red-500" /></Button>
+                      </div>
+                    ))}
+                    {externalLinkFields.length < 10 && <Button type="button" variant="outline" size="sm" onClick={() => appendExternalLink({ url: '', text: '', prompt: '' })}><PlusCircle className="mr-2 h-4 w-4" />Add External Link</Button>}
+                  </div>
+
+                  {/* CTA */}
+                  <div className="space-y-4 rounded-md border p-4">
+                     <h3 className="font-medium">Call to Action (CTA)</h3>
+                     <FormField control={form.control} name="cta.link" render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="CTA URL (e.g. https://yoursite.com/contact)" /></FormControl><FormMessage /></FormItem>)} />
+                     <FormField control={form.control} name="cta.prompt" render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="CTA Prompt (e.g. encourage users to contact us)" /></FormControl><FormMessage /></FormItem>)} />
+                  </div>
+                </motion.div>
+              )}
+              </AnimatePresence>
+
               <Button
                 type="submit"
                 disabled={isLoading}
@@ -446,9 +555,9 @@ export default function BlogGeneratorForm() {
                     )}
                     {copiedAll ? 'Copied!' : 'Copy All'}
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleCopySection} disabled={sections.length === 0}>
+                  <Button variant="outline" size="sm" onClick={handleCopySection} disabled={isLastSection}>
                     <Copy className="mr-2 h-4 w-4" />
-                    Copy Section by Section
+                    {isLastSection ? 'Finished' : 'Copy Section by Section'}
                   </Button>
                 </div>
               </div>
@@ -469,6 +578,20 @@ export default function BlogGeneratorForm() {
                   <ReactMarkdown>{result.blogPost}</ReactMarkdown>
                 )}
               </div>
+                <div className="mt-8 flex justify-center">
+                    <Button
+                        onClick={() => form.handleSubmit(onSubmit)()}
+                        disabled={isLoading}
+                        className="w-full md:w-auto"
+                        >
+                        {isLoading ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                            <Sparkles className="mr-2 h-4 w-4" />
+                        )}
+                        Regenerate Blog Post
+                    </Button>
+                </div>
             </div>
           )}
         </CardContent>
@@ -483,9 +606,9 @@ export default function BlogGeneratorForm() {
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="fixed top-20 right-4 z-50"
           >
-            <Button onClick={handleCopySection} className="shadow-lg">
-              <CopyCheck className="mr-2 h-4 w-4" />
-              Copy Next Section ({currentSectionIndex + 1}/{sections.length})
+            <Button onClick={handleCopySection} className="shadow-lg" disabled={isLastSection}>
+              {isLastSection ? <Check className="mr-2 h-4 w-4" /> : <CopyCheck className="mr-2 h-4 w-4" />}
+              {isLastSection ? 'All Copied' : `Copy Next Section (${currentSectionIndex + 1}/${sections.length})`}
             </Button>
           </motion.div>
         )}
