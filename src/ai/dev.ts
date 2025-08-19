@@ -14,3 +14,6 @@ import '@/ai/flows/youtube-content-idea-generator';
 import '@/ai/flows/youtube-viral-hooks-generator';
 import '@/ai/flows/youtube-description-generator';
 import '@/ai/flows/x-tweet-generator';
+import '@/ai/flows/tiktok-content-idea-generator';
+import '@/ai/flows/tiktok-viral-hooks-generator';
+import '@/ai/flows/tiktok-description-generator';

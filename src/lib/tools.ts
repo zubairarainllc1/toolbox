@@ -160,10 +160,24 @@ export const tools: Tool[] = [
   },
   // TikTok
   {
-    title: "TikTok Video Idea Generator",
+    title: "TikTok Content Idea Generator",
     description: "Get viral video ideas for your TikTok channel.",
-    href: "/tools/tiktok-video-idea-generator",
+    href: "/tools/tiktok-content-idea-generator",
     icon: Lightbulb,
+    category: "TikTok",
+  },
+  {
+    title: "TikTok Viral Hooks Generator",
+    description: "Generate catchy hooks to make your TikToks go viral.",
+    href: "/tools/tiktok-viral-hooks-generator",
+    icon: Sparkles,
+    category: "TikTok",
+  },
+  {
+    title: "TikTok Description Generator",
+    description: "Generate engaging descriptions for your TikTok videos.",
+    href: "/tools/tiktok-description-generator",
+    icon: FileText,
     category: "TikTok",
   },
 ];
