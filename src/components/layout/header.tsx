@@ -1,5 +1,7 @@
+
 "use client";
 
+import { useState }from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -18,6 +20,11 @@ const navLinks = [
 
 export function Header() {
   const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleLinkClick = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   const NavLinks = ({ className }: { className?: string }) => (
     <>
@@ -25,6 +32,7 @@ export function Header() {
         <Link
           key={href}
           href={href}
+          onClick={handleLinkClick}
           className={cn(
             "text-sm font-medium transition-colors hover:text-primary",
             pathname === href ? "text-primary" : "text-muted-foreground",
@@ -53,11 +61,22 @@ export function Header() {
         </div>
         
         <nav className="hidden items-center space-x-6 text-sm font-medium md:flex">
-          <NavLinks />
+          {navLinks.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                pathname === href ? "text-primary" : "text-muted-foreground"
+              )}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
 
         <div className="flex flex-1 items-center justify-end md:hidden">
-          <Sheet>
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost">
                 <Menu className="h-6 w-6" />
@@ -66,7 +85,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="right">
               <nav className="grid gap-6 text-lg font-medium mt-8">
-                 <Link href="/" className="flex items-center space-x-2">
+                 <Link href="/" onClick={handleLinkClick} className="flex items-center space-x-2">
                     <Image 
                       src="https://i.postimg.cc/RFn7M2MK/Codexign.png" 
                       alt="Codexign Logo"
