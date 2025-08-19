@@ -5,7 +5,6 @@ import {
   GenerateCaptionInput,
 } from "@/ai/flows/caption-generator";
 import { generateInstagramBio, GenerateInstagramBioInput } from "@/ai/flows/instagram-bio-generator";
-import { generateYoutubeIdeas } from "@/ai/flows/youtube-idea-generator";
 import { generateYoutubeTitle } from "@/ai/flows/youtube-title-generator";
 import { generateTikTokVideoIdeas } from "@/ai/flows/tiktok-video-idea-generator";
 import { generateInstagramHashtags, GenerateInstagramHashtagsInput } from "@/ai/flows/instagram-hashtag-generator";
@@ -46,10 +45,6 @@ const instagramCaptionSchema = z.object({
 const facebookCaptionSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
   includeEmojis: z.boolean().optional(),
-});
-
-const youtubeIdeasSchema = z.object({
-  topic: z.string().min(3, "Please provide a topic."),
 });
 
 const youtubeTitleSchema = z.object({
@@ -231,29 +226,6 @@ export async function handleGenerateFacebookCaptions(prevState: any, formData: F
     console.error(error);
     return {
       message: "Failed to generate captions. Please try again later.",
-    };
-  }
-}
-
-export async function handleGenerateYoutubeIdeas(prevState: any, formData: FormData) {
-  const validatedFields = youtubeIdeasSchema.safeParse({
-    topic: formData.get("topic"),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      message: validatedFields.error.errors.map((e) => e.message).join(", "),
-    };
-  }
-
-  try {
-    const result = await generateYoutubeIdeas(validatedFields.data.topic);
-    return {
-      ideas: result.ideas,
-    };
-  } catch (error) {
-    return {
-      message: "Failed to generate ideas. Please try again later.",
     };
   }
 }

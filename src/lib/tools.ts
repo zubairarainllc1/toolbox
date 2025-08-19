@@ -124,13 +124,6 @@ export const tools: Tool[] = [
   },
   // YouTube
   {
-    title: "YouTube Video Idea Generator",
-    description: "Generate creative video ideas for your channel.",
-    href: "/tools/youtube-idea-generator",
-    icon: Lightbulb,
-    category: "YouTube",
-  },
-  {
     title: "YouTube Title Generator",
     description: "Create catchy titles to increase your video views.",
     href: "/tools/youtube-title-generator",
