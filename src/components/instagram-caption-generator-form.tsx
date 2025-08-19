@@ -27,8 +27,8 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { generateInstagramCaptions } from '@/ai/flows/generate-instagram-captions';
-import { GeneratedContent } from '../GeneratedContent';
-import { Slider } from '../ui/slider';
+import { GeneratedContent } from '@/components/GeneratedContent';
+import { Slider } from '@/components/ui/slider';
 
 const formSchema = z.object({
   topic: z
