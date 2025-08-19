@@ -9,3 +9,4 @@ import '@/ai/flows/youtube-idea-generator';
 import '@/ai/flows/youtube-title-generator';
 import '@/ai/flows/tiktok-video-idea-generator';
 import '@/ai/flows/instagram-hashtag-generator';
+import '@/ai/flows/generate-instagram-captions';
