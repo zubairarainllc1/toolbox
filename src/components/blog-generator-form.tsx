@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Sparkles, Clipboard, Check, PlusCircle, MinusCircle, Copy, CopyCheck, RefreshCw, ChevronDown, Link, ExternalLink } from 'lucide-react';
+import { Loader2, Sparkles, Clipboard, Check, PlusCircle, MinusCircle, Copy, CopyCheck, RefreshCw, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -47,16 +47,6 @@ const formSchema = z.object({
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']),
   wordCount: z.number().min(600).max(2500),
   includePoints: z.boolean().default(false).optional(),
-  internalLinks: z.array(z.object({ 
-    url: z.string().url({ message: "Invalid URL for internal link." }),
-    text: z.string().min(1, { message: "Anchor text for internal link is required." }),
-    prompt: z.string().min(1, { message: "Prompt for internal link is required." }),
-  })).max(10),
-  externalLinks: z.array(z.object({
-    url: z.string().url({ message: "Invalid URL for external link." }),
-    text: z.string().min(1, { message: "Anchor text for external link is required." }),
-    prompt: z.string().min(1, { message: "Prompt for external link is required." }),
-  })).max(10),
   cta: z.object({
     link: z.string().url({ message: "Invalid URL for CTA." }),
     prompt: z.string().min(1, { message: "Prompt for CTA is required." }),
@@ -92,8 +82,6 @@ export default function BlogGeneratorForm() {
       tone: 'informative',
       wordCount: 1000,
       includePoints: false,
-      internalLinks: [],
-      externalLinks: [],
       cta: { link: '', prompt: '' },
     },
   });
@@ -102,16 +90,6 @@ export default function BlogGeneratorForm() {
     control: form.control,
     name: "relatedKeywords",
   });
-
-  const { fields: internalLinkFields, append: appendInternalLink, remove: removeInternalLink } = useFieldArray({
-    control: form.control,
-    name: "internalLinks",
-  });
-  const { fields: externalLinkFields, append: appendExternalLink, remove: removeExternalLink } = useFieldArray({
-    control: form.control,
-    name: "externalLinks",
-  });
-
 
   const resetCopyState = () => {
     setCopiedAll(false);
@@ -455,34 +433,6 @@ export default function BlogGeneratorForm() {
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="space-y-8 overflow-hidden"
                 >
-                  {/* Internal Links */}
-                  <div className="space-y-4 rounded-md border p-4">
-                    <h3 className="font-medium flex items-center gap-2"><Link className="h-4 w-4" /> Internal Links</h3>
-                    {internalLinkFields.map((field, index) => (
-                      <div key={field.id} className="p-3 bg-secondary/50 rounded-md space-y-2 relative">
-                        <FormField control={form.control} name={`internalLinks.${index}.url`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="URL (e.g. https://yoursite.com/page)" /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name={`internalLinks.${index}.text`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="Anchor Text (e.g. check out our services)" /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name={`internalLinks.${index}.prompt`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="AI Prompt (e.g. place this link after discussing marketing)" /></FormControl><FormMessage /></FormItem>)} />
-                        <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1" onClick={() => removeInternalLink(index)}><MinusCircle className="h-5 w-5 text-red-500" /></Button>
-                      </div>
-                    ))}
-                    {internalLinkFields.length < 10 && <Button type="button" variant="outline" size="sm" onClick={() => appendInternalLink({ url: '', text: '', prompt: '' })}><PlusCircle className="mr-2 h-4 w-4" />Add Internal Link</Button>}
-                  </div>
-
-                  {/* External Links */}
-                  <div className="space-y-4 rounded-md border p-4">
-                    <h3 className="font-medium flex items-center gap-2"><ExternalLink className="h-4 w-4" /> External Links</h3>
-                    {externalLinkFields.map((field, index) => (
-                      <div key={field.id} className="p-3 bg-secondary/50 rounded-md space-y-2 relative">
-                        <FormField control={form.control} name={`externalLinks.${index}.url`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="URL (e.g. https://moz.com/blog)" /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name={`externalLinks.${index}.text`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="Anchor Text (e.g. according to Moz)" /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name={`externalLinks.${index}.prompt`} render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="AI Prompt (e.g. link this when citing statistics)" /></FormControl><FormMessage /></FormItem>)} />
-                        <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1" onClick={() => removeExternalLink(index)}><MinusCircle className="h-5 w-5 text-red-500" /></Button>
-                      </div>
-                    ))}
-                    {externalLinkFields.length < 10 && <Button type="button" variant="outline" size="sm" onClick={() => appendExternalLink({ url: '', text: '', prompt: '' })}><PlusCircle className="mr-2 h-4 w-4" />Add External Link</Button>}
-                  </div>
-
                   {/* CTA */}
                   <div className="space-y-4 rounded-md border p-4">
                      <h3 className="font-medium">Call to Action (CTA)</h3>

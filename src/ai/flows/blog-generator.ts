@@ -12,12 +12,6 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-const LinkSchema = z.object({
-  url: z.string().url(),
-  text: z.string(),
-  prompt: z.string(),
-});
-
 const CTASchema = z.object({
   link: z.string().url(),
   prompt: z.string(),
@@ -30,8 +24,6 @@ const GenerateBlogPostInputSchema = z.object({
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']).describe('The desired tone for the blog post.'),
   wordCount: z.number().min(600).max(2500).describe('The desired word count for the blog post.'),
   includePoints: z.boolean().optional().describe('Whether or not to include bullet points in the blog post.'),
-  internalLinks: z.array(LinkSchema).optional().describe('A list of internal links to include in the blog post.'),
-  externalLinks: z.array(LinkSchema).optional().describe('A list of external, high-authority links to include.'),
   cta: CTASchema.optional().describe('A call-to-action to include in the conclusion.'),
 });
 export type GenerateBlogPostInput = z.infer<typeof GenerateBlogPostInputSchema>;
@@ -66,21 +58,6 @@ const prompt = ai.definePrompt({
 - Word Count: Approximately {{{wordCount}}} words.
 {{#if includePoints}}
 - Include bulleted lists where it makes sense to break up content.
-{{/if}}
-
-**Link Integration Rules (VERY IMPORTANT):**
-Your goal is to naturally weave the provided links into the article. Use the 'prompt' for each link to understand the context where it should be placed.
-{{#if internalLinks}}
-- Internal Links to integrate:
-  {{#each internalLinks}}
-  - Integrate this link: URL="{{url}}", Anchor Text="{{text}}". The prompt for its context is: "{{prompt}}". Find a suitable, natural place in the article to add this link based on the prompt's context.
-  {{/each}}
-{{/if}}
-{{#if externalLinks}}
-- External Links to integrate:
-  {{#each externalLinks}}
-  - Integrate this link: URL="{{url}}", Anchor Text="{{text}}". The prompt for its context is: "{{prompt}}". Find a suitable, natural place in the article to add this link based on the prompt's context.
-  {{/each}}
 {{/if}}
 
 **SEO Metadata Requirements:**
@@ -121,7 +98,6 @@ Your goal is to naturally weave the provided links into the article. Use the 'pr
     {{#if includePoints}}
     - Lists: Use bullet points or numbered lists to present information clearly where appropriate (e.g., for steps, tips, or examples).
     {{/if}}
-    - Linking: Integrate the provided links using Markdown format like [Anchor Text](URL). The placement must be natural and contextually relevant based on the linking prompts provided. If a link's context does not fit the article, do not include it.
 
 5. **Keyword Placement Summary:**
     - Title (H1): Once.

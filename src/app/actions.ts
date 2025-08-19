@@ -102,16 +102,6 @@ const blogPostSchema = z.object({
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']),
   wordCount: z.coerce.number().min(600).max(2500),
   includePoints: z.boolean().optional(),
-  internalLinks: z.array(z.object({
-    url: z.string().url({ message: 'Invalid URL for internal link.' }),
-    text: z.string().min(1, { message: 'Anchor text for internal link is required.' }),
-    prompt: z.string().min(1, { message: 'Prompt for internal link is required.' }),
-  })).optional(),
-  externalLinks: z.array(z.object({
-    url: z.string().url({ message: 'Invalid URL for external link.' }),
-    text: z.string().min(1, { message: 'Anchor text for external link is required.' }),
-    prompt: z.string().min(1, { message: 'Prompt for external link is required.' }),
-  })).optional(),
   cta: z.object({
     link: z.string().url({ message: 'Invalid URL for CTA.' }),
     prompt: z.string().min(1, { message: 'Prompt for CTA is required.' }),
