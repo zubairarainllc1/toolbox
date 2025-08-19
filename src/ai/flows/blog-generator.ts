@@ -69,18 +69,17 @@ const prompt = ai.definePrompt({
 {{/if}}
 
 **Link Integration Rules (VERY IMPORTANT):**
+Your goal is to naturally weave the provided links into the article. Use the 'prompt' for each link to understand the context where it should be placed.
 {{#if internalLinks}}
 - Internal Links to integrate:
   {{#each internalLinks}}
-  - You are given this link: URL="{{url}}", Anchor Text="{{text}}". The goal is to place it naturally in the text based on this prompt: "{{prompt}}".
-  - **Critically, you must ONLY insert this link if the context described in the prompt genuinely fits within the article's topic. If it does not fit, DO NOT INCLUDE THE LINK.** Do not force irrelevant links.
+  - Integrate this link: URL="{{url}}", Anchor Text="{{text}}". The prompt for its context is: "{{prompt}}". Find a suitable, natural place in the article to add this link based on the prompt's context.
   {{/each}}
 {{/if}}
 {{#if externalLinks}}
 - External Links to integrate:
   {{#each externalLinks}}
-  - You are given this link: URL="{{url}}", Anchor Text="{{text}}". The goal is to place it naturally in the text based on this prompt: "{{prompt}}".
-  - **Critically, you must ONLY insert this link if the context described in the prompt genuinely fits within the article's topic. If it does not fit, DO NOT INCLUDE THE LINK.** Do not force irrelevant links.
+  - Integrate this link: URL="{{url}}", Anchor Text="{{text}}". The prompt for its context is: "{{prompt}}". Find a suitable, natural place in the article to add this link based on the prompt's context.
   {{/each}}
 {{/if}}
 
@@ -122,7 +121,7 @@ const prompt = ai.definePrompt({
     {{#if includePoints}}
     - Lists: Use bullet points or numbered lists to present information clearly where appropriate (e.g., for steps, tips, or examples).
     {{/if}}
-    - Linking: Integrate the provided links using Markdown format like [Anchor Text](URL). The placement must be natural and contextually relevant based on the linking prompts provided. **If a link's context does not fit the article, do not include it.**
+    - Linking: Integrate the provided links using Markdown format like [Anchor Text](URL). The placement must be natural and contextually relevant based on the linking prompts provided. If a link's context does not fit the article, do not include it.
 
 5. **Keyword Placement Summary:**
     - Title (H1): Once.
