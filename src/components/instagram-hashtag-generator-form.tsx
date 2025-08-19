@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { Clipboard } from "lucide-react";
 
 const initialState = {
   hashtags: [],
@@ -28,6 +29,7 @@ export default function InstagramHashtagGeneratorForm() {
   const [state, formAction] = useActionState(handleGenerateHashtags, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  const [selectedHashtags, setSelectedHashtags] = useState<string[]>([]);
 
   useEffect(() => {
     if (state.message) {
@@ -37,7 +39,31 @@ export default function InstagramHashtagGeneratorForm() {
         description: state.message,
       });
     }
-  }, [state.message, toast]);
+    if (state.hashtags && state.hashtags.length > 0) {
+      setSelectedHashtags([]); // Reset selection when new hashtags are generated
+    }
+  }, [state, toast]);
+  
+  const handleHashtagClick = (tag: string) => {
+    setSelectedHashtags(prev => 
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
+  }
+
+  const copySelected = () => {
+    if (selectedHashtags.length > 0) {
+      const selectedText = selectedHashtags.join(" ");
+      navigator.clipboard.writeText(selectedText);
+      toast({
+        description: `${selectedHashtags.length} hashtag(s) copied to clipboard!`,
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        description: "No hashtags selected to copy.",
+      });
+    }
+  };
 
   const copyAll = () => {
     if (state.hashtags && state.hashtags.length > 0) {
@@ -67,17 +93,20 @@ export default function InstagramHashtagGeneratorForm() {
 
         {state.hashtags && state.hashtags.length > 0 && (
           <div className="mt-8">
-            <h3 className="font-headline text-lg font-semibold mb-4">Generated Hashtags:</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-headline text-lg font-semibold">Generated Hashtags:</h3>
+              <Button variant="outline" size="sm" onClick={copySelected} disabled={selectedHashtags.length === 0}>
+                <Clipboard className="mr-2 h-4 w-4" />
+                Copy Selected
+              </Button>
+            </div>
             <div className="flex flex-wrap gap-2">
               {state.hashtags.map((tag: string) => (
                 <Badge
                   key={tag}
-                  variant="secondary"
-                  className="cursor-pointer transition-colors hover:bg-primary/80"
-                  onClick={() => {
-                    navigator.clipboard.writeText(tag);
-                    toast({ description: `Copied "${tag}"` });
-                  }}
+                  variant={selectedHashtags.includes(tag) ? "default" : "secondary"}
+                  className="cursor-pointer transition-all"
+                  onClick={() => handleHashtagClick(tag)}
                 >
                   {tag}
                 </Badge>

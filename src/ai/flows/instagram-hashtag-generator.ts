@@ -15,7 +15,7 @@ const GenerateInstagramHashtagsInputSchema = z.string().describe('A description 
 export type GenerateInstagramHashtagsInput = z.infer<typeof GenerateInstagramHashtagsInputSchema>;
 
 const GenerateInstagramHashtagsOutputSchema = z.object({
-  hashtags: z.array(z.string()).describe('An array of relevant hashtags for the Instagram post.'),
+  hashtags: z.array(z.string()).describe('An array of 50 relevant hashtags for the Instagram post.'),
 });
 export type GenerateInstagramHashtagsOutput = z.infer<typeof GenerateInstagramHashtagsOutputSchema>;
 
@@ -29,9 +29,9 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateInstagramHashtagsOutputSchema},
   prompt: `You are an expert social media manager specializing in generating relevant and trending hashtags for Instagram posts.
 
-  Generate a list of hashtags based on the following description or keywords: {{{$input}}}
+  Generate a list of 50 hashtags based on the following description or keywords: {{{$input}}}
 
-  The hashtags should be relevant to the content and help increase its visibility.
+  The hashtags must be highly relevant to the provided keywords and should be effective at increasing post visibility.
 
   Return the hashtags as a JSON array of strings.  Do not include any intro or explanation text.  Just return the JSON.  Do not include a backtick code fence.
 
