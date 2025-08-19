@@ -12,11 +12,6 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-const CTASchema = z.object({
-  link: z.string().url(),
-  prompt: z.string(),
-});
-
 const GenerateBlogPostInputSchema = z.object({
   topic: z.string().describe('The main topic for the blog post.'),
   mainKeyword: z.string().describe('The primary SEO keyword for the blog post.'),
@@ -24,7 +19,6 @@ const GenerateBlogPostInputSchema = z.object({
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']).describe('The desired tone for the blog post.'),
   wordCount: z.number().min(600).max(2500).describe('The desired word count for the blog post.'),
   includePoints: z.boolean().optional().describe('Whether or not to include bullet points in the blog post.'),
-  cta: CTASchema.optional().describe('A call-to-action to include in the conclusion.'),
 });
 export type GenerateBlogPostInput = z.infer<typeof GenerateBlogPostInputSchema>;
 
@@ -109,12 +103,6 @@ const prompt = ai.definePrompt({
 6.  **Conclusion:**
     - A brief summary of the main points.
     - Must include the main keyword "{{{mainKeyword}}}" once.
-    {{#if cta}}
-    - **Call to Action (CTA) Rule:** You must seamlessly integrate the following CTA into the conclusion. The CTA should feel like a natural extension of the blog post's topic, based on the provided prompt.
-      - Link: {{{cta.link}}}
-      - Prompt for CTA context: "{{{cta.prompt}}}"
-      - **Do not make it sound like an advertisement. It must be woven into the concluding paragraph organically.**
-    {{/if}}
 
 Return the complete response as a single JSON object with the fields 'blogPost', 'metaTitle', 'metaDescription', and 'permalink'. For the 'blogPost' field, do not add any introductory text before the H1 title.`,
 });

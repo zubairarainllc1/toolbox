@@ -102,10 +102,6 @@ const blogPostSchema = z.object({
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']),
   wordCount: z.coerce.number().min(600).max(2500),
   includePoints: z.boolean().optional(),
-  cta: z.object({
-    link: z.string().url({ message: 'Invalid URL for CTA.' }),
-    prompt: z.string().min(1, { message: 'Prompt for CTA is required.' }),
-  }).optional(),
 });
 
 

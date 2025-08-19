@@ -47,10 +47,6 @@ const formSchema = z.object({
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']),
   wordCount: z.number().min(600).max(2500),
   includePoints: z.boolean().default(false).optional(),
-  cta: z.object({
-    link: z.string().url({ message: "Invalid URL for CTA." }),
-    prompt: z.string().min(1, { message: "Prompt for CTA is required." }),
-  }).optional(),
 });
 
 type ResultState = {
@@ -82,7 +78,6 @@ export default function BlogGeneratorForm() {
       tone: 'informative',
       wordCount: 1000,
       includePoints: false,
-      cta: { link: '', prompt: '' },
     },
   });
 
@@ -137,7 +132,6 @@ export default function BlogGeneratorForm() {
     const submissionData = {
       ...values,
       relatedKeywords: values.relatedKeywords?.map(kw => kw.value).filter(Boolean),
-      cta: (values.cta?.link && values.cta?.prompt) ? values.cta : undefined,
     };
 
     try {
@@ -430,13 +424,6 @@ export default function BlogGeneratorForm() {
                       </FormItem>
                     )}
                   />
-                  
-                  {/* CTA */}
-                  <div className="space-y-4 rounded-md border p-4">
-                     <h3 className="font-medium">Call to Action (CTA)</h3>
-                     <FormField control={form.control} name="cta.link" render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="CTA URL (e.g. https://yoursite.com/contact)" /></FormControl><FormMessage /></FormItem>)} />
-                     <FormField control={form.control} name="cta.prompt" render={({ field }) => (<FormItem><FormControl><Input {...field} placeholder="CTA Prompt (e.g. encourage users to contact us)" /></FormControl><FormMessage /></FormItem>)} />
-                  </div>
                 </motion.div>
               )}
               </AnimatePresence>
