@@ -1,10 +1,11 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Sparkles, Clipboard, Check, PlusCircle, MinusCircle } from 'lucide-react';
+import { Loader2, Sparkles, Clipboard, Check, PlusCircle, MinusCircle, Copy } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -28,6 +29,7 @@ import { handleGenerateBlogPost } from '@/app/actions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Slider } from './ui/slider';
 import { Checkbox } from './ui/checkbox';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   topic: z
@@ -46,7 +48,19 @@ export default function BlogGeneratorForm() {
   const { toast } = useToast();
   const [result, setResult] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copiedAll, setCopiedAll] = useState(false);
+  const [copyIndex, setCopyIndex] = useState(0);
+
+  const blogSections = useMemo(() => {
+    if (!result) return [];
+    // Split by one or more newlines to separate sections
+    return result.split(/\n+/).filter(section => section.trim() !== '');
+  }, [result]);
+
+  useEffect(() => {
+    setCopyIndex(0);
+  }, [result]);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -68,7 +82,7 @@ export default function BlogGeneratorForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setResult(null);
-    setCopied(false);
+    setCopiedAll(false);
     
     const submissionData = {
         ...values,
@@ -98,14 +112,26 @@ export default function BlogGeneratorForm() {
     }
   }
 
-  const copyToClipboard = () => {
+  const copyAllToClipboard = () => {
     if (!result) return;
     navigator.clipboard.writeText(result);
-    setCopied(true);
+    setCopiedAll(true);
     toast({
       description: 'Blog post copied to clipboard!',
     });
+    setTimeout(() => setCopiedAll(false), 2000);
   };
+  
+  const copySectionBySection = () => {
+    if (blogSections.length === 0) return;
+    const currentSection = blogSections[copyIndex];
+    navigator.clipboard.writeText(currentSection);
+    toast({
+      description: 'Section copied to clipboard!',
+    });
+    setCopyIndex((prevIndex) => (prevIndex + 1) % blogSections.length);
+  };
+
 
   return (
     <Card>
@@ -288,21 +314,34 @@ export default function BlogGeneratorForm() {
         )}
         {result && (
           <div className="mt-8">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-wrap gap-2 justify-between items-center mb-4">
               <h3 className="font-headline text-2xl font-semibold">
                 Generated Blog Post
               </h3>
-              <Button variant="outline" size="sm" onClick={copyToClipboard}>
-                {copied ? (
-                  <Check className="mr-2 h-4 w-4 text-green-500" />
-                ) : (
-                  <Clipboard className="mr-2 h-4 w-4" />
-                )}
-                {copied ? 'Copied!' : 'Copy to Clipboard'}
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={copySectionBySection}>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy Section by Section
+                </Button>
+                <Button variant="outline" size="sm" onClick={copyAllToClipboard}>
+                  {copiedAll ? (
+                    <Check className="mr-2 h-4 w-4 text-green-500" />
+                  ) : (
+                    <Clipboard className="mr-2 h-4 w-4" />
+                  )}
+                  {copiedAll ? 'Copied!' : 'Copy All'}
+                </Button>
+              </div>
             </div>
-            <div className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none p-6 rounded-md border bg-secondary/50 whitespace-pre-wrap">
-              {result}
+            <div className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none p-6 rounded-md border bg-secondary/50">
+              {blogSections.map((section, index) => (
+                  <p key={index} className={cn(
+                      'transition-colors duration-300 rounded p-1',
+                      {'bg-primary/20': index === copyIndex }
+                  )}>
+                      {section}
+                  </p>
+              ))}
             </div>
           </div>
         )}
