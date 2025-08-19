@@ -116,6 +116,13 @@ export const tools: Tool[] = [
   },
   // X (Twitter)
   {
+    title: "X (Twitter) Tweet Generator",
+    description: "Generate engaging tweets for your X profile.",
+    href: "/tools/x-tweet-generator",
+    icon: Sparkles,
+    category: "X (Twitter)",
+  },
+  {
     title: "X (Twitter) Hashtag Generator",
     description: "Generate viral hashtags to boost your reach on X.",
     href: "/tools/x-hashtag-generator",
