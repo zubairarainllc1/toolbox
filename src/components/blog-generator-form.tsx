@@ -606,53 +606,57 @@ export default function BlogGeneratorForm() {
                 </CardContent>
               </Card>
 
-              <div className="flex flex-wrap gap-2 justify-between items-center mb-4">
-                <h3 className="font-headline text-2xl font-semibold">
-                  Generated Blog Post
-                </h3>
-                <div className='flex gap-2'>
-                  <Dialog open={plagiarismDialogOpen} onOpenChange={setPlagiarismDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm">
-                        <FileScan className="mr-2 h-4 w-4" />
-                        Plagiarism
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Plagiarism Checker</DialogTitle>
-                      </DialogHeader>
-                      <div className="relative">
-                        <div className="absolute left-2 top-2.5 text-right text-muted-foreground text-sm flex flex-col gap-[7px] select-none">
-                            {plagiarismText.split('\n').map((_, i) => (
-                                <div key={i}>{i+1}</div>
-                            ))}
+              <div className="flex flex-col gap-2 mb-4">
+                <div className="flex flex-wrap gap-2 justify-between items-center">
+                  <h3 className="font-headline text-2xl font-semibold">
+                    Generated Blog Post
+                  </h3>
+                  <div className='flex gap-2'>
+                    <Dialog open={plagiarismDialogOpen} onOpenChange={setPlagiarismDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <FileScan className="mr-2 h-4 w-4" />
+                          Plagiarism
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Plagiarism Checker</DialogTitle>
+                        </DialogHeader>
+                        <div className="relative">
+                          <div className="absolute left-2 top-2.5 text-right text-muted-foreground text-sm flex flex-col gap-[7px] select-none">
+                              {plagiarismText.split('\n').map((_, i) => (
+                                  <div key={i}>{i+1}</div>
+                              ))}
+                          </div>
+                          <Textarea 
+                              value={plagiarismText} 
+                              onChange={(e) => setPlagiarismText(e.target.value)}
+                              placeholder="Paste text here, one sentence per line..."
+                              rows={10}
+                              className="pl-8"
+                          />
                         </div>
-                        <Textarea 
-                            value={plagiarismText} 
-                            onChange={(e) => setPlagiarismText(e.target.value)}
-                            placeholder="Paste text here, one sentence per line..."
-                            rows={10}
-                            className="pl-8"
-                        />
-                      </div>
-                      <DialogFooter>
-                        <Button onClick={handleFindPlagiarism}>Find Sentences</Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                  <Button variant="outline" size="sm" onClick={handleCopyAll}>
-                    {copiedAll ? (
-                      <Check className="mr-2 h-4 w-4 text-green-500" />
-                    ) : (
-                      <Clipboard className="mr-2 h-4 w-4" />
-                    )}
-                    {copiedAll ? 'Copied!' : 'Copy All'}
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleCopySection} disabled={isLastSection}>
-                    <Copy className="mr-2 h-4 w-4" />
-                    {isLastSection ? 'Finished' : 'Copy Section by Section'}
-                  </Button>
+                        <DialogFooter>
+                          <Button onClick={handleFindPlagiarism}>Find Sentences</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                    <Button variant="outline" size="sm" onClick={handleCopyAll}>
+                      {copiedAll ? (
+                        <Check className="mr-2 h-4 w-4 text-green-500" />
+                      ) : (
+                        <Clipboard className="mr-2 h-4 w-4" />
+                      )}
+                      {copiedAll ? 'Copied!' : 'Copy All'}
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                    <Button variant="outline" size="sm" onClick={handleCopySection} disabled={isLastSection}>
+                      <Copy className="mr-2 h-4 w-4" />
+                      {isLastSection ? 'Finished' : 'Copy Section by Section'}
+                    </Button>
                 </div>
               </div>
               <div 
