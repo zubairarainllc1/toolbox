@@ -13,6 +13,7 @@ import { z } from 'genkit';
 
 const GenerateInstagramCaptionsInputSchema = z.object({
   topic: z.string().describe('The topic or keyword for the social media post.'),
+  includeEmojis: z.boolean().optional().describe('Whether or not to include emojis in the captions.'),
 });
 export type GenerateInstagramCaptionsInput = z.infer<
   typeof GenerateInstagramCaptionsInputSchema
@@ -39,7 +40,9 @@ const prompt = ai.definePrompt({
   output: { schema: GenerateInstagramCaptionsOutputSchema },
   prompt: `You are a viral Instagram marketing expert. Generate 5 unique and engaging Instagram captions for a post about "{{{topic}}}".
 
-The captions should be creative, relevant, and encourage interaction. Do not include any emojis or hashtags.
+The captions should be creative and relevant.
+{{#if includeEmojis}}Each caption should include 1 or 2 relevant emojis.{{/if}}
+Do not include any hashtags.
 
 Return the captions as a JSON array of strings. Do not include any intro or explanation text. Just return the JSON.`,
 });

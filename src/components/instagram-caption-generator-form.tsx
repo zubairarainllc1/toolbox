@@ -26,11 +26,13 @@ import {
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { generateInstagramCaptions } from '@/ai/flows/generate-instagram-captions';
+import { Checkbox } from './ui/checkbox';
 
 const formSchema = z.object({
   topic: z
     .string()
     .min(3, 'Please enter a topic with at least 3 characters.'),
+  includeEmojis: z.boolean().default(false).optional(),
 });
 
 type InstagramResult = {
@@ -46,6 +48,7 @@ export default function InstagramCaptionGeneratorForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       topic: '',
+      includeEmojis: false,
     },
   });
 
@@ -98,6 +101,28 @@ export default function InstagramCaptionGeneratorForm() {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="includeEmojis"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      Include Emojis
+                    </FormLabel>
+                     <p className="text-sm text-muted-foreground">
+                      Add 1-2 relevant emojis to each caption.
+                    </p>
+                  </div>
+                </FormItem>
+              )}
+            />
             <Button type="submit" disabled={isLoading} className="w-full md:w-auto bg-foreground text-background hover:bg-foreground/80">
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -121,7 +146,7 @@ export default function InstagramCaptionGeneratorForm() {
               {result.captions.map((caption: string, index: number) => (
                 <li
                   key={index}
-                  className="flex items-center justify-between gap-3 p-3 rounded-md border bg-secondary/50"
+                  className="flex items-center justify-between gap-3 p-3 rounded-md border bg-secondary/50 cursor-pointer transition-colors hover:bg-secondary"
                   onClick={() => copyCaption(caption)}
                 >
                   <span className="text-sm flex-grow">{caption}</span>
