@@ -101,13 +101,6 @@ export const tools: Tool[] = [
   },
   // Facebook
   {
-    title: "Facebook Hashtag Generator",
-    description: "Find the best hashtags for your Facebook content.",
-    href: "/tools/facebook-hashtag-generator",
-    icon: Hash,
-    category: "Facebook",
-  },
-  {
     title: "Facebook Post Caption",
     description: "Generate compelling posts to engage your audience.",
     href: "/tools/facebook-post-generator",
@@ -115,13 +108,6 @@ export const tools: Tool[] = [
     category: "Facebook",
   },
   // X (Twitter)
-  {
-    title: "X Hashtag Generator",
-    description: "Discover trending hashtags for your posts on X.",
-    href: "/tools/x-hashtag-generator",
-    icon: Hash,
-    category: "X (Twitter)",
-  },
   {
     title: "X Content Ideas",
     description: "Get inspiration for your next viral tweet.",
@@ -145,13 +131,6 @@ export const tools: Tool[] = [
     category: "YouTube",
   },
   // TikTok
-  {
-    title: "TikTok Hashtag Generator",
-    description: "Find trending and relevant hashtags for your TikTok videos.",
-    href: "/tools/tiktok-hashtag-generator",
-    icon: Hash,
-    category: "TikTok",
-  },
   {
     title: "TikTok Video Idea Generator",
     description: "Get viral video ideas for your TikTok channel.",

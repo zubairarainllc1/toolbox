@@ -6,13 +6,10 @@ import {
 } from "@/ai/flows/caption-generator";
 import { generateInstagramHashtags } from "@/ai/flows/instagram-hashtag-generator";
 import { generateInstagramBio, GenerateInstagramBioInput } from "@/ai/flows/instagram-bio-generator";
-import { generateFacebookHashtags } from "@/ai/flows/facebook-hashtag-generator";
 import { generateFacebookPost, GenerateFacebookPostInput } from "@/ai/flows/facebook-post-generator";
-import { generateXHashtags } from "@/ai/flows/x-hashtag-generator";
 import { generateXContentIdeas } from "@/ai/flows/x-content-ideas-generator";
 import { generateYoutubeIdeas } from "@/ai/flows/youtube-idea-generator";
 import { generateYoutubeTitle } from "@/ai/flows/youtube-title-generator";
-import { generateTikTokHashtags } from "@/ai/flows/tiktok-hashtag-generator";
 import { generateTikTokVideoIdeas } from "@/ai/flows/tiktok-video-idea-generator";
 import { z } from "zod";
 
@@ -124,29 +121,6 @@ export async function handleGenerateInstagramBio(prevState: any, formData: FormD
   }
 }
 
-export async function handleGenerateFacebookHashtags(prevState: any, formData: FormData) {
-  const validatedFields = hashtagSchema.safeParse({
-    description: formData.get("description"),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      message: validatedFields.error.errors.map((e) => e.message).join(", "),
-    };
-  }
-
-  try {
-    const result = await generateFacebookHashtags(validatedFields.data.description);
-    return {
-      hashtags: result.hashtags,
-    };
-  } catch (error) {
-    return {
-      message: "Failed to generate hashtags. Please try again later.",
-    };
-  }
-}
-
 export async function handleGenerateFacebookPost(prevState: any, formData: FormData) {
   const validatedFields = facebookPostSchema.safeParse({
     postDescription: formData.get("postDescription"),
@@ -167,29 +141,6 @@ export async function handleGenerateFacebookPost(prevState: any, formData: FormD
     console.error(error);
     return {
       message: "Failed to generate post. Please try again later.",
-    };
-  }
-}
-
-export async function handleGenerateXHashtags(prevState: any, formData: FormData) {
-  const validatedFields = hashtagSchema.safeParse({
-    description: formData.get("description"),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      message: validatedFields.error.errors.map((e) => e.message).join(", "),
-    };
-  }
-
-  try {
-    const result = await generateXHashtags(validatedFields.data.description);
-    return {
-      hashtags: result.hashtags,
-    };
-  } catch (error) {
-    return {
-      message: "Failed to generate hashtags. Please try again later.",
     };
   }
 }
@@ -259,29 +210,6 @@ export async function handleGenerateYoutubeTitle(prevState: any, formData: FormD
   } catch (error) {
     return {
       message: "Failed to generate titles. Please try again later.",
-    };
-  }
-}
-
-export async function handleGenerateTikTokHashtags(prevState: any, formData: FormData) {
-  const validatedFields = hashtagSchema.safeParse({
-    description: formData.get("description"),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      message: validatedFields.error.errors.map((e) => e.message).join(", "),
-    };
-  }
-
-  try {
-    const result = await generateTikTokHashtags(validatedFields.data.description);
-    return {
-      hashtags: result.hashtags,
-    };
-  } catch (error) {
-    return {
-      message: "Failed to generate hashtags. Please try again later.",
     };
   }
 }
