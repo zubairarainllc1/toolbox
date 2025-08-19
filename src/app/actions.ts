@@ -5,7 +5,6 @@ import {
   GenerateCaptionInput,
 } from "@/ai/flows/caption-generator";
 import { generateInstagramBio, GenerateInstagramBioInput } from "@/ai/flows/instagram-bio-generator";
-import { generateXContentIdeas } from "@/ai/flows/x-content-ideas-generator";
 import { generateYoutubeIdeas } from "@/ai/flows/youtube-idea-generator";
 import { generateYoutubeTitle } from "@/ai/flows/youtube-title-generator";
 import { generateTikTokVideoIdeas } from "@/ai/flows/tiktok-video-idea-generator";
@@ -14,6 +13,7 @@ import { generateFacebookHashtags, GenerateFacebookHashtagsInput } from "@/ai/fl
 import { z } from "zod";
 import { generateInstagramCaptions, GenerateInstagramCaptionsInput } from "@/ai/flows/generate-instagram-captions";
 import { generateFacebookCaptions, GenerateFacebookCaptionsInput } from "@/ai/flows/facebook-caption-generator";
+import { generateXHashtags, GenerateXHashtagsInput } from "@/ai/flows/x-hashtag-generator";
 
 
 const captionSchema = z.object({
@@ -34,6 +34,10 @@ const facebookHashtagSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
 });
 
+const xHashtagSchema = z.object({
+  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
+});
+
 const instagramCaptionSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
   includeEmojis: z.boolean().optional(),
@@ -42,10 +46,6 @@ const instagramCaptionSchema = z.object({
 const facebookCaptionSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
   includeEmojis: z.boolean().optional(),
-});
-
-const xContentIdeasSchema = z.object({
-  topic: z.string().min(3, "Please provide a topic."),
 });
 
 const youtubeIdeasSchema = z.object({
@@ -160,6 +160,31 @@ export async function handleGenerateFacebookHashtags(prevState: any, formData: F
   }
 }
 
+export async function handleGenerateXHashtags(prevState: any, formData: FormData) {
+  const validatedFields = xHashtagSchema.safeParse({
+    topic: formData.get("topic"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: validatedFields.error.errors.map((e) => e.message).join(", "),
+    };
+  }
+
+  try {
+    const result = await generateXHashtags(validatedFields.data as GenerateXHashtagsInput);
+    const uniqueHashtags = Array.from(new Set(result.hashtags));
+    return {
+      hashtags: uniqueHashtags,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: "Failed to generate hashtags. Please try again later.",
+    };
+  }
+}
+
 export async function handleGenerateInstagramCaptions(prevState: any, formData: FormData) {
   const validatedFields = instagramCaptionSchema.safeParse({
     topic: formData.get("topic"),
@@ -206,30 +231,6 @@ export async function handleGenerateFacebookCaptions(prevState: any, formData: F
     console.error(error);
     return {
       message: "Failed to generate captions. Please try again later.",
-    };
-  }
-}
-
-
-export async function handleGenerateXContentIdeas(prevState: any, formData: FormData) {
-  const validatedFields = xContentIdeasSchema.safeParse({
-    topic: formData.get("topic"),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      message: validatedFields.error.errors.map((e) => e.message).join(", "),
-    };
-  }
-
-  try {
-    const result = await generateXContentIdeas(validatedFields.data.topic);
-    return {
-      ideas: result.ideas,
-    };
-  } catch (error) {
-    return {
-      message: "Failed to generate ideas. Please try again later.",
     };
   }
 }

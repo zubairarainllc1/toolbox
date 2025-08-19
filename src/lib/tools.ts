@@ -116,10 +116,10 @@ export const tools: Tool[] = [
   },
   // X (Twitter)
   {
-    title: "X Content Ideas",
-    description: "Get inspiration for your next viral tweet.",
-    href: "/tools/x-content-ideas",
-    icon: Lightbulb,
+    title: "X (Twitter) Hashtag Generator",
+    description: "Generate viral hashtags to boost your reach on X.",
+    href: "/tools/x-hashtag-generator",
+    icon: Hash,
     category: "X (Twitter)",
   },
   // YouTube
