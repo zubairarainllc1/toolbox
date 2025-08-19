@@ -57,7 +57,16 @@ export default function XTweetGeneratorForm() {
     setIsLoading(true);
     setResult(null);
     try {
-      const response = await handleGenerateTwitterContent({}, new FormData(form.control.fields._f.current.form));
+      const formData = new FormData();
+      formData.append('topic', values.topic);
+      if (values.context) {
+        formData.append('context', values.context);
+      }
+      if (values.maxWords) {
+        formData.append('maxWords', String(values.maxWords));
+      }
+
+      const response = await handleGenerateTwitterContent({}, formData);
       if(response.tweets) {
         setResult(response);
       } else if (response.message) {
