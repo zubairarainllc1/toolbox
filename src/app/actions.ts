@@ -20,6 +20,7 @@ import { generateYoutubeContentIdeas, GenerateYoutubeContentIdeasInput } from "@
 import { generateTikTokContentIdeas, GenerateTikTokContentIdeasInput } from "@/ai/flows/tiktok-content-idea-generator";
 import { generateYoutubeTitle, GenerateYoutubeTitleInput } from "@/ai/flows/youtube-title-generator";
 import { generateTikTokVideoIdeas, GenerateTikTokVideoIdeasInput } from "@/ai/flows/tiktok-video-idea-generator";
+import { generateBlogPost, GenerateBlogPostInput } from "@/ai/flows/blog-generator";
 
 
 const captionSchema = z.object({
@@ -91,6 +92,12 @@ const tiktokContentIdeasSchema = z.object({
 
 const tiktokVideoIdeasSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
+});
+
+const blogPostSchema = z.object({
+  topic: z.string().min(10, 'Please enter a topic with at least 10 characters.'),
+  keywords: z.string().optional(),
+  tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']),
 });
 
 
@@ -470,6 +477,30 @@ export async function handleGenerateYoutubeContentIdeas(
       console.error(error);
       return {
         message: 'Failed to generate ideas. Please try again later.',
+      };
+    }
+  }
+
+  export async function handleGenerateBlogPost(
+    input: GenerateBlogPostInput
+  ): Promise<{ blogPost?: string; message?: string }> {
+    const validatedFields = blogPostSchema.safeParse(input);
+  
+    if (!validatedFields.success) {
+      return {
+        message: validatedFields.error.errors.map((e) => e.message).join(', '),
+      };
+    }
+  
+    try {
+      const result = await generateBlogPost(validatedFields.data);
+      return {
+        blogPost: result.blogPost,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        message: 'Failed to generate blog post. Please try again later.',
       };
     }
   }

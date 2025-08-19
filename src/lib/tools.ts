@@ -13,6 +13,7 @@ import {
   QrCode,
   KeyRound,
   CaseUpper,
+  PenSquare,
 } from "lucide-react";
 import * as React from 'react';
 
@@ -48,6 +49,13 @@ export interface Tool {
 
 export const tools: Tool[] = [
   // Productive Tools
+  {
+    title: "Blog Post Generator",
+    description: "Generate a full-length, SEO-friendly blog post from a topic.",
+    href: "/tools/blog-generator",
+    icon: PenSquare,
+    category: "Productive Tools",
+  },
   {
     title: "Font Generator",
     description: "Create stylish fonts for bios, posts, and comments.",
