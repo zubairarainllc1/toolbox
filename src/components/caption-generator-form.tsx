@@ -1,11 +1,11 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { handleGenerateCaption } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle, Bot, Clipboard, ClipboardCheck } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
@@ -25,7 +25,7 @@ function SubmitButton() {
 }
 
 export default function CaptionGeneratorForm() {
-  const [state, formAction] = useFormState(handleGenerateCaption, initialState);
+  const [state, formAction] = useActionState(handleGenerateCaption, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const [copied, setCopied] = useState(false);

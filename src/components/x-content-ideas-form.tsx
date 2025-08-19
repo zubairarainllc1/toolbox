@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { handleGenerateXContentIdeas } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +25,7 @@ function SubmitButton() {
 }
 
 export default function XContentIdeasForm() {
-  const [state, formAction] = useFormState(handleGenerateXContentIdeas, initialState);
+  const [state, formAction] = useActionState(handleGenerateXContentIdeas, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 

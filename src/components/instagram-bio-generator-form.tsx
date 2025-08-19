@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { handleGenerateInstagramBio } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +29,7 @@ function SubmitButton() {
 }
 
 export default function InstagramBioGeneratorForm() {
-  const [state, formAction] = useFormState(handleGenerateInstagramBio, initialState);
+  const [state, formAction] = useActionState(handleGenerateInstagramBio, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const [copied, setCopied] = useState(false);

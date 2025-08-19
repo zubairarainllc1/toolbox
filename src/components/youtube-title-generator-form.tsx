@@ -1,6 +1,7 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { handleGenerateYoutubeTitle } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,7 +25,7 @@ function SubmitButton() {
 }
 
 export default function YoutubeTitleGeneratorForm() {
-  const [state, formAction] = useFormState(handleGenerateYoutubeTitle, initialState);
+  const [state, formAction] = useActionState(handleGenerateYoutubeTitle, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
