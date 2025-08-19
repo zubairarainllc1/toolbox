@@ -135,13 +135,6 @@ export const tools: Tool[] = [
     icon: FileText,
     category: "YouTube",
   },
-  {
-    title: "YouTube Title Generator",
-    description: "Generate SEO-optimized and catchy titles for your videos.",
-    href: "/tools/youtube-title-generator",
-    icon: Type,
-    category: "YouTube",
-  },
   // TikTok
   {
     title: "TikTok Content Idea Generator",
@@ -162,13 +155,6 @@ export const tools: Tool[] = [
     description: "Generate engaging descriptions for your TikTok videos.",
     href: "/tools/tiktok-description-generator",
     icon: FileText,
-    category: "TikTok",
-  },
-  {
-    title: "TikTok Title Generator",
-    description: "Generate SEO-optimized and catchy titles for your videos.",
-    href: "/tools/tiktok-title-generator",
-    icon: Type,
     category: "TikTok",
   },
 ];

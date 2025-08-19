@@ -14,8 +14,6 @@ import { generateYoutubeViralHooks, GenerateYoutubeViralHooksInput } from "@/ai/
 import { generateYoutubeDescription, GenerateYoutubeDescriptionInput } from "@/ai/flows/youtube-description-generator";
 import { generateTikTokViralHooks, GenerateTikTokViralHooksInput } from "@/ai/flows/tiktok-viral-hooks-generator";
 import { generateTikTokDescription, GenerateTikTokDescriptionInput } from "@/ai/flows/tiktok-description-generator";
-import { generateYoutubeTitle, GenerateYoutubeTitleInput } from "@/ai/flows/youtube-title-generator";
-import { generateTikTokTitle, GenerateTikTokTitleInput } from "@/ai/flows/tiktok-title-generator";
 import { generateYoutubeContentIdeas, GenerateYoutubeContentIdeasInput } from "@/ai/flows/youtube-content-idea-generator";
 import { generateTikTokContentIdeas, GenerateTikTokContentIdeasInput } from "@/ai/flows/tiktok-content-idea-generator";
 
@@ -64,20 +62,6 @@ const tiktokViralHooksSchema = z.object({
 const tiktokDescriptionSchema = z.object({
   title: z.string().min(10, 'Please provide a longer title.'),
   keywords: z.string().optional(),
-});
-
-const youtubeTitleSchema = z.object({
-  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
-  keywords: z.string().optional(),
-  tone: z.enum(['professional', 'casual', 'funny', 'inspirational', 'witty', 'informative']),
-  quantity: z.number().min(1).max(10),
-});
-
-const tiktokTitleSchema = z.object({
-    topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
-    keywords: z.string().optional(),
-    tone: z.enum(['professional', 'casual', 'funny', 'inspirational', 'witty', 'informative']),
-    quantity: z.number().min(1).max(10),
 });
 
 const youtubeContentIdeasSchema = z.object({
@@ -332,54 +316,6 @@ export async function handleGenerateTikTokDescription(
       message: 'Failed to generate description. Please try again later.',
     };
   }
-}
-
-export async function handleGenerateYoutubeTitle(
-  input: GenerateYoutubeTitleInput
-): Promise<{ titles?: string[]; message?: string }> {
-    const validatedFields = youtubeTitleSchema.safeParse(input);
-
-    if (!validatedFields.success) {
-        return {
-            message: validatedFields.error.errors.map((e) => e.message).join(', '),
-        };
-    }
-
-    try {
-        const result = await generateYoutubeTitle(validatedFields.data);
-        return {
-            titles: result.titles,
-        };
-    } catch (error) {
-        console.error(error);
-        return {
-            message: 'Failed to generate titles. Please try again later.',
-        };
-    }
-}
-
-export async function handleGenerateTikTokTitle(
-  input: GenerateTikTokTitleInput
-): Promise<{ titles?: string[]; message?: string }> {
-    const validatedFields = tiktokTitleSchema.safeParse(input);
-
-    if (!validatedFields.success) {
-        return {
-            message: validatedFields.error.errors.map((e) => e.message).join(', '),
-        };
-    }
-
-    try {
-        const result = await generateTikTokTitle(validatedFields.data);
-        return {
-            titles: result.titles,
-        };
-    } catch (error) {
-        console.error(error);
-        return {
-            message: 'Failed to generate titles. Please try again later.',
-        };
-    }
 }
 
 export async function handleGenerateYoutubeContentIdeas(
