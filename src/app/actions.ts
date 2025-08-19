@@ -5,7 +5,6 @@ import {
   GenerateCaptionInput,
 } from "@/ai/flows/caption-generator";
 import { generateInstagramBio, GenerateInstagramBioInput } from "@/ai/flows/instagram-bio-generator";
-import { generateFacebookPost, GenerateFacebookPostInput } from "@/ai/flows/facebook-post-generator";
 import { generateXContentIdeas } from "@/ai/flows/x-content-ideas-generator";
 import { generateYoutubeIdeas } from "@/ai/flows/youtube-idea-generator";
 import { generateYoutubeTitle } from "@/ai/flows/youtube-title-generator";
@@ -25,10 +24,6 @@ const instagramBioSchema = z.object({
 
 const instagramHashtagSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
-});
-
-const facebookPostSchema = z.object({
-  postDescription: z.string().min(3, "Please provide a longer description."),
 });
 
 const xContentIdeasSchema = z.object({
@@ -118,30 +113,6 @@ export async function handleGenerateInstagramHashtags(prevState: any, formData: 
     console.error(error);
     return {
       message: "Failed to generate hashtags. Please try again later.",
-    };
-  }
-}
-
-export async function handleGenerateFacebookPost(prevState: any, formData: FormData) {
-  const validatedFields = facebookPostSchema.safeParse({
-    postDescription: formData.get("postDescription"),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      message: validatedFields.error.errors.map((e) => e.message).join(", "),
-    };
-  }
-  
-  try {
-    const result = await generateFacebookPost(validatedFields.data as GenerateFacebookPostInput);
-    return {
-      posts: result.posts,
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      message: "Failed to generate post. Please try again later.",
     };
   }
 }
