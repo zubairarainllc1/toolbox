@@ -134,6 +134,13 @@ export const tools: Tool[] = [
     icon: FileText,
     category: "YouTube",
   },
+  {
+    title: "YouTube Title Generator",
+    description: "Generate catchy titles for your YouTube videos.",
+    href: "/tools/youtube-title-generator",
+    icon: Type,
+    category: "YouTube",
+  },
   // TikTok
   {
     title: "TikTok Content Idea Generator",

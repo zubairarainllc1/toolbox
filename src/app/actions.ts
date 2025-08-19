@@ -17,6 +17,7 @@ import { generateTikTokDescription, GenerateTikTokDescriptionInput } from "@/ai/
 import { generateTikTokTitle, GenerateTikTokTitleInput } from "@/ai/flows/tiktok-title-generator";
 import { generateYoutubeContentIdeas, GenerateYoutubeContentIdeasInput } from "@/ai/flows/youtube-content-idea-generator";
 import { generateTikTokContentIdeas, GenerateTikTokContentIdeasInput } from "@/ai/flows/tiktok-content-idea-generator";
+import { generateYoutubeTitle, GenerateYoutubeTitleInput } from "@/ai/flows/youtube-title-generator";
 
 
 const captionSchema = z.object({
@@ -70,6 +71,13 @@ const tiktokTitleSchema = z.object({
   keywords: z.string().optional(),
   tone: z.enum(['professional', 'casual', 'funny', 'inspirational', 'witty', 'informative']),
 });
+
+const youtubeTitleSchema = z.object({
+  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
+  keywords: z.string().optional(),
+  tone: z.enum(['professional', 'casual', 'funny', 'inspirational', 'witty', 'informative']),
+});
+
 
 const youtubeContentIdeasSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
@@ -338,6 +346,30 @@ export async function handleGenerateTikTokTitle(
 
   try {
     const result = await generateTikTokTitle(validatedFields.data);
+    return {
+      titles: result.titles,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: 'Failed to generate titles. Please try again later.',
+    };
+  }
+}
+
+export async function handleGenerateYoutubeTitle(
+  input: GenerateYoutubeTitleInput
+): Promise<{ titles?: string[]; message?: string }> {
+  const validatedFields = youtubeTitleSchema.safeParse(input);
+
+  if (!validatedFields.success) {
+    return {
+      message: validatedFields.error.errors.map((e) => e.message).join(', '),
+    };
+  }
+
+  try {
+    const result = await generateYoutubeTitle(validatedFields.data);
     return {
       titles: result.titles,
     };
