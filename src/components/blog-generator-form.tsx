@@ -33,6 +33,7 @@ import { Slider } from './ui/slider';
 import { Checkbox } from './ui/checkbox';
 import { cn } from '@/lib/utils';
 import { Textarea } from './ui/textarea';
+import { Label } from './ui/label';
 
 const formSchema = z.object({
   topic: z
