@@ -144,6 +144,13 @@ export const tools: Tool[] = [
     icon: Lightbulb,
     category: "YouTube",
   },
+    {
+    title: "YouTube Viral Hooks Generator",
+    description: "Generate catchy hooks to make your videos go viral.",
+    href: "/tools/youtube-viral-hooks-generator",
+    icon: Sparkles,
+    category: "YouTube",
+  },
   // TikTok
   {
     title: "TikTok Video Idea Generator",

@@ -14,6 +14,7 @@ import { generateXHashtags, GenerateXHashtagsInput } from "@/ai/flows/x-hashtag-
 import { generateYoutubeTitle, GenerateYoutubeTitleInput } from "@/ai/flows/youtube-title-generator";
 import { generateYoutubeContentIdeas, GenerateYoutubeContentIdeasInput } from "@/ai/flows/youtube-content-idea-generator";
 import { generateXTweets, GenerateXTweetsInput } from "@/ai/flows/x-tweet-generator";
+import { generateYoutubeViralHooks, GenerateYoutubeViralHooksInput } from "@/ai/flows/youtube-viral-hooks-generator";
 
 
 const captionSchema = z.object({
@@ -53,6 +54,10 @@ const youtubeTitleSchema = z.object({
 });
 
 const youtubeContentIdeasSchema = z.object({
+  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
+});
+
+const youtubeViralHooksSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
 });
 
@@ -284,11 +289,37 @@ export async function handleGenerateYoutubeContentIdeas(prevState: any, formData
   }
 }
 
-export async function handleGenerateXTweets(prevState: any, formData: FormData) {
-  const validatedFields = xTweetSchema.safeParse({
+export async function handleGenerateYoutubeViralHooks(prevState: any, formData: FormData) {
+  const validatedFields = youtubeViralHooksSchema.safeParse({
     topic: formData.get("topic"),
-    context: formData.get("context"),
   });
+
+  if (!validatedFields.success) {
+    return {
+      message: validatedFields.error.errors.map((e) => e.message).join(", "),
+    };
+  }
+
+  try {
+    const result = await generateYoutubeViralHooks(validatedFields.data as GenerateYoutubeViralHooksInput);
+    return {
+      hooks: result.hooks,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: "Failed to generate hooks. Please try again later.",
+    };
+  }
+}
+
+export async function handleGenerateXTweets(prevState: any, formData: FormData) {
+  const values = {
+    topic: formData.get('topic'),
+    context: formData.get('context'),
+  };
+  
+  const validatedFields = xTweetSchema.safeParse(values);
 
   if (!validatedFields.success) {
     return {
