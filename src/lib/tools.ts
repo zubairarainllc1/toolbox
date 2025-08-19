@@ -10,6 +10,7 @@ import {
   FileText,
   Type,
   Hash,
+  Lightbulb,
 } from "lucide-react";
 
 export type ToolCategory =
@@ -67,7 +68,6 @@ export const tools: Tool[] = [
     href: "/tools/instagram-bio-generator",
     icon: Sparkles,
     category: "Instagram",
-    comingSoon: true,
   },
   // Facebook
   {
@@ -76,7 +76,6 @@ export const tools: Tool[] = [
     href: "/tools/facebook-hashtag-generator",
     icon: Hash,
     category: "Facebook",
-    comingSoon: true,
   },
   {
     title: "Facebook Post Generator",
@@ -84,7 +83,6 @@ export const tools: Tool[] = [
     href: "/tools/facebook-post-generator",
     icon: Type,
     category: "Facebook",
-    comingSoon: true,
   },
   // X (Twitter)
   {
@@ -93,24 +91,21 @@ export const tools: Tool[] = [
     href: "/tools/x-hashtag-generator",
     icon: Hash,
     category: "X (Twitter)",
-    comingSoon: true,
   },
   {
     title: "X Content Ideas",
     description: "Get inspiration for your next viral tweet.",
     href: "/tools/x-content-ideas",
-    icon: Sparkles,
+    icon: Lightbulb,
     category: "X (Twitter)",
-    comingSoon: true,
   },
   // YouTube
   {
     title: "YouTube Video Idea Generator",
     description: "Generate creative video ideas for your channel.",
     href: "/tools/youtube-idea-generator",
-    icon: Youtube,
+    icon: Lightbulb,
     category: "YouTube",
-    comingSoon: true,
   },
   {
     title: "YouTube Title Generator",
@@ -118,7 +113,6 @@ export const tools: Tool[] = [
     href: "/tools/youtube-title-generator",
     icon: Type,
     category: "YouTube",
-    comingSoon: true,
   },
 ];
 
