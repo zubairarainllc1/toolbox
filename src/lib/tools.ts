@@ -12,6 +12,7 @@ import {
   Lightbulb,
   QrCode,
   KeyRound,
+  CaseUpper,
 } from "lucide-react";
 import * as React from 'react';
 
@@ -47,6 +48,13 @@ export interface Tool {
 
 export const tools: Tool[] = [
   // Productive Tools
+  {
+    title: "Font Generator",
+    description: "Create stylish fonts for bios, posts, and comments.",
+    href: "/tools/font-generator",
+    icon: CaseUpper,
+    category: "Productive Tools",
+  },
   {
     title: "Image Converter",
     description: "Convert images between JPG, PNG, and WebP formats.",
