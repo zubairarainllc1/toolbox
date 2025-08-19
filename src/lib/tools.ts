@@ -34,7 +34,6 @@ export type ToolCategory =
   | "Productive Tools"
   | "Instagram"
   | "Facebook"
-  | "X (Twitter)"
   | "YouTube"
   | "TikTok";
 
@@ -114,21 +113,6 @@ export const tools: Tool[] = [
     icon: Hash,
     category: "Facebook",
   },
-  // X (Twitter)
-  {
-    title: "X (Twitter) Hashtag Generator",
-    description: "Generate viral hashtags to boost your reach on X.",
-    href: "/tools/x-hashtag-generator",
-    icon: Hash,
-    category: "X (Twitter)",
-  },
-  {
-    title: "X (Tweet) Generator",
-    description: "Generate engaging tweets for your X profile.",
-    href: "/tools/x-tweet-generator",
-    icon: Twitter,
-    category: "X (Twitter)",
-  },
   // YouTube
   {
     title: "YouTube Content Idea Generator",
@@ -137,7 +121,7 @@ export const tools: Tool[] = [
     icon: Lightbulb,
     category: "YouTube",
   },
-    {
+  {
     title: "YouTube Viral Hooks Generator",
     description: "Generate catchy hooks to make your videos go viral.",
     href: "/tools/youtube-viral-hooks-generator",
@@ -149,6 +133,13 @@ export const tools: Tool[] = [
     description: "Generate SEO-friendly descriptions for your videos.",
     href: "/tools/youtube-description-generator",
     icon: FileText,
+    category: "YouTube",
+  },
+  {
+    title: "YouTube Title Generator",
+    description: "Generate SEO-optimized and catchy titles for your videos.",
+    href: "/tools/youtube-title-generator",
+    icon: Type,
     category: "YouTube",
   },
   // TikTok
@@ -173,13 +164,19 @@ export const tools: Tool[] = [
     icon: FileText,
     category: "TikTok",
   },
+  {
+    title: "TikTok Title Generator",
+    description: "Generate SEO-optimized and catchy titles for your videos.",
+    href: "/tools/tiktok-title-generator",
+    icon: Type,
+    category: "TikTok",
+  },
 ];
 
 export const toolCategories: ToolCategory[] = [
   "Productive Tools",
   "Instagram",
   "Facebook",
-  "X (Twitter)",
   "YouTube",
   "TikTok",
 ];
@@ -188,7 +185,6 @@ export const categoryIcons: Record<ToolCategory, LucideIcon | React.FC<React.SVG
   "Productive Tools": Sparkles,
   Instagram: Instagram,
   Facebook: Facebook,
-  "X (Twitter)": Twitter,
   YouTube: Youtube,
   TikTok: TikTokIcon,
 };
