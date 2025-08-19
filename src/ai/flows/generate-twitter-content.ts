@@ -15,6 +15,7 @@ const GenerateTwitterContentInputSchema = z.object({
   topic: z.string().describe('The main topic or idea for the tweets.'),
   context: z.string().optional().describe('Any additional context, keywords, or links to include.'),
   tweetsQuantity: z.number().int().min(1).max(10).describe('The number of tweets to generate.'),
+  maxWords: z.coerce.number().min(5).max(1000).optional().describe('The maximum number of words per tweet.'),
 });
 export type GenerateTwitterContentInput = z.infer<typeof GenerateTwitterContentInputSchema>;
 
@@ -41,6 +42,7 @@ Context: {{{context}}}
 {{/if}}
 
 The tweets should be short, impactful, and suitable for the X platform. Ensure they are distinct from each other.
+{{#if maxWords}}Each tweet should be approximately {{{maxWords}}} words long.{{/if}}
 
 Return the result as a JSON object with a "tweets" field containing an array of the generated tweets, and an empty "hashtags" array. Do not include any intro or explanation text. Just return the JSON.`,
 });

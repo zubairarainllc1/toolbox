@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Sparkles, Twitter } from 'lucide-react';
+import { Loader2, Sparkles, Twitter, Clipboard } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,23 +24,19 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { generateTwitterContent } from '@/ai/flows/generate-twitter-content';
-import { GeneratedContent } from './GeneratedContent';
+import { handleGenerateTwitterContent } from '@/app/actions';
 import { Textarea } from './ui/textarea';
-import { Slider } from './ui/slider';
 
 const formSchema = z.object({
   topic: z
     .string()
     .min(3, 'Please enter a topic with at least 3 characters.'),
   context: z.string().optional(),
-  tweetsQuantity: z.number().min(1).max(10).default(3),
-  maxWords: z.coerce.number().min(5).max(500).optional(),
+  maxWords: z.coerce.number().min(5).max(1000).optional(),
 });
 
 type TwitterResult = {
   tweets: string[];
-  hashtags: string[]; // This will be empty
 };
 
 export default function XTweetGeneratorForm() {
@@ -53,7 +49,6 @@ export default function XTweetGeneratorForm() {
     defaultValues: {
       topic: '',
       context: '',
-      tweetsQuantity: 3,
       maxWords: undefined,
     },
   });
@@ -62,8 +57,16 @@ export default function XTweetGeneratorForm() {
     setIsLoading(true);
     setResult(null);
     try {
-      const response = await generateTwitterContent(values);
-      setResult(response);
+      const response = await handleGenerateTwitterContent({}, new FormData(form.control.fields._f.current.form));
+      if(response.tweets) {
+        setResult(response);
+      } else if (response.message) {
+         toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: response.message,
+        });
+      }
     } catch (e) {
       toast({
         variant: 'destructive',
@@ -75,6 +78,13 @@ export default function XTweetGeneratorForm() {
       setIsLoading(false);
     }
   }
+
+  const copyTweet = (tweet: string) => {
+    navigator.clipboard.writeText(tweet);
+    toast({
+      description: 'Tweet copied to clipboard!',
+    });
+  };
 
   return (
     <Card>
@@ -115,24 +125,6 @@ export default function XTweetGeneratorForm() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="tweetsQuantity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Number of Tweets: {field.value}</FormLabel>
-                  <FormControl>
-                    <Slider
-                      min={1}
-                      max={10}
-                      step={1}
-                      defaultValue={[field.value]}
-                      onValueChange={(value) => field.onChange(value[0])}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
              <FormField
               control={form.control}
               name="maxWords"
@@ -143,13 +135,12 @@ export default function XTweetGeneratorForm() {
                     <Input
                       type="number"
                       min="5"
-                      max="500"
+                      max="1000"
                       placeholder="e.g., 50"
                       {...field}
-                      value={field.value ?? ""}
                       onChange={(e) => {
                         const value = e.target.value;
-                        field.onChange(value === '' ? undefined : value);
+                        field.onChange(value === '' ? undefined : Number(value));
                       }}
                     />
                   </FormControl>
@@ -174,8 +165,23 @@ export default function XTweetGeneratorForm() {
             </div>
         )}
         {result && (
-          <div className="mt-8 space-y-6">
-            <GeneratedContent title="Generated Tweets" items={result.tweets} variant="paragraph" />
+          <div className="mt-8">
+            <h3 className="font-headline text-lg font-semibold mb-4">Generated Tweets:</h3>
+            <ul className="space-y-3">
+              {result.tweets.map((tweet: string, index: number) => (
+                <li
+                  key={index}
+                  className="flex items-center justify-between gap-3 p-3 rounded-md border bg-secondary/50 cursor-pointer transition-colors hover:bg-secondary"
+                  onClick={() => copyTweet(tweet)}
+                >
+                  <span className="text-sm flex-grow">{tweet}</span>
+                   <Button variant="ghost" size="icon">
+                    <Clipboard className="h-4 w-4" />
+                    <span className="sr-only">Copy tweet</span>
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </CardContent>
