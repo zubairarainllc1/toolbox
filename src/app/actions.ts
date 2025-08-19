@@ -18,6 +18,7 @@ import { generateTikTokTitle, GenerateTikTokTitleInput } from "@/ai/flows/tiktok
 import { generateYoutubeContentIdeas, GenerateYoutubeContentIdeasInput } from "@/ai/flows/youtube-content-idea-generator";
 import { generateTikTokContentIdeas, GenerateTikTokContentIdeasInput } from "@/ai/flows/tiktok-content-idea-generator";
 import { generateYoutubeTitle, GenerateYoutubeTitleInput } from "@/ai/flows/youtube-title-generator";
+import { generateTikTokVideoIdeas, GenerateTikTokVideoIdeasInput } from "@/ai/flows/tiktok-video-idea-generator";
 
 
 const captionSchema = z.object({
@@ -85,6 +86,10 @@ const youtubeContentIdeasSchema = z.object({
 
 const tiktokContentIdeasSchema = z.object({
     topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
+});
+
+const tiktokVideoIdeasSchema = z.object({
+  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
 });
 
 
@@ -427,6 +432,35 @@ export async function handleGenerateYoutubeContentIdeas(
     try {
       const result = await generateTikTokContentIdeas(
         validatedFields.data as GenerateTikTokContentIdeasInput
+      );
+      return {
+        ideas: result.ideas,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        message: 'Failed to generate ideas. Please try again later.',
+      };
+    }
+  }
+
+  export async function handleGenerateTikTokVideoIdeas(
+    prevState: any,
+    formData: FormData
+  ) {
+    const validatedFields = tiktokVideoIdeasSchema.safeParse({
+      topic: formData.get('topic'),
+    });
+  
+    if (!validatedFields.success) {
+      return {
+        message: validatedFields.error.errors.map((e) => e.message).join(', '),
+      };
+    }
+  
+    try {
+      const result = await generateTikTokVideoIdeas(
+        validatedFields.data as GenerateTikTokVideoIdeasInput
       );
       return {
         ideas: result.ideas,

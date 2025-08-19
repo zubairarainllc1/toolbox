@@ -15,3 +15,4 @@ import '@/ai/flows/tiktok-description-generator';
 import '@/ai/flows/youtube-content-idea-generator';
 import '@/ai/flows/tiktok-title-generator';
 import '@/ai/flows/youtube-title-generator';
+import '@/ai/flows/tiktok-video-idea-generator';

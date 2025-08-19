@@ -11,11 +11,13 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const GenerateTikTokVideoIdeasInputSchema = z.string().describe('A topic or niche for the TikTok channel.');
+const GenerateTikTokVideoIdeasInputSchema = z.object({
+    topic: z.string().describe('A topic or niche for the TikTok channel.'),
+});
 export type GenerateTikTokVideoIdeasInput = z.infer<typeof GenerateTikTokVideoIdeasInputSchema>;
 
 const GenerateTikTokVideoIdeasOutputSchema = z.object({
-  ideas: z.array(z.string()).describe('An array of creative TikTok video ideas.'),
+  ideas: z.array(z.string()).describe('An array of 5 creative TikTok video ideas.'),
 });
 export type GenerateTikTokVideoIdeasOutput = z.infer<typeof GenerateTikTokVideoIdeasOutputSchema>;
 
@@ -27,7 +29,7 @@ const prompt = ai.definePrompt({
   name: 'generateTikTokVideoIdeasPrompt',
   input: {schema: GenerateTikTokVideoIdeasInputSchema},
   output: {schema: GenerateTikTokVideoIdeasOutputSchema},
-  prompt: `You are a TikTok content strategist. Generate a list of 5 creative and engaging video ideas for a channel focused on the following topic: {{{$input}}}
+  prompt: `You are a TikTok content strategist. Generate a list of 5 creative and engaging video ideas for a channel focused on the following topic: {{{topic}}}
 
   The ideas should be short, catchy, and have potential to go viral on TikTok.
 
