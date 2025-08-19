@@ -25,8 +25,6 @@ const instagramBioSchema = z.object({
 
 const instagramHashtagSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
-  contentType: z.enum(['photo', 'video']),
-  quantity: z.coerce.number().min(1).max(30),
 });
 
 const facebookPostSchema = z.object({
@@ -102,8 +100,6 @@ export async function handleGenerateInstagramBio(prevState: any, formData: FormD
 export async function handleGenerateInstagramHashtags(prevState: any, formData: FormData) {
   const validatedFields = instagramHashtagSchema.safeParse({
     topic: formData.get("topic"),
-    contentType: formData.get("contentType"),
-    quantity: formData.get("quantity"),
   });
 
   if (!validatedFields.success) {

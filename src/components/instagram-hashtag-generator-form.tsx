@@ -9,8 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Clipboard, Instagram, Sparkles, Check } from "lucide-react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
-import { Slider } from "./ui/slider";
 import { Badge } from "./ui/badge";
 
 const initialState = {
@@ -32,7 +30,6 @@ export default function InstagramHashtagGeneratorForm() {
   const [state, formAction] = useActionState(handleGenerateInstagramHashtags, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const [quantity, setQuantity] = useState(15);
   const [selectedHashtags, setSelectedHashtags] = useState<string[]>([]);
   const [allCopied, setAllCopied] = useState(false);
 
@@ -93,37 +90,7 @@ export default function InstagramHashtagGeneratorForm() {
               required
             />
           </div>
-          
-          <div className="space-y-3">
-            <Label>Content Type</Label>
-            <RadioGroup name="contentType" defaultValue="photo" className="flex gap-4">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="photo" id="photo" />
-                <Label htmlFor="photo" className="font-normal">Photo</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="video" id="video" />
-                <Label htmlFor="video" className="font-normal">Video (Reel/Story)</Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <Label htmlFor="quantity">Number of Hashtags</Label>
-              <span className="text-sm font-medium">{quantity}</span>
-            </div>
-            <Slider
-              id="quantity"
-              name="quantity"
-              min={5}
-              max={30}
-              step={1}
-              value={[quantity]}
-              onValueChange={(value) => setQuantity(value[0])}
-            />
-          </div>
-          
+                    
           <SubmitButton />
         </form>
 
@@ -137,9 +104,9 @@ export default function InstagramHashtagGeneratorForm() {
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {state.hashtags.map((tag: string) => (
+              {state.hashtags.map((tag: string, index: number) => (
                 <Badge
-                  key={tag}
+                  key={`${tag}-${index}`}
                   variant={selectedHashtags.includes(tag) ? "default" : "secondary"}
                   className="cursor-pointer transition-all"
                   onClick={() => handleHashtagClick(tag)}
