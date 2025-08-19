@@ -43,7 +43,7 @@ const formSchema = z.object({
   mainKeyword: z
     .string()
     .min(3, 'Please enter a main keyword with at least 3 characters.'),
-  relatedKeywords: z.array(z.object({ value: z.string().min(1, "Related keyword cannot be empty.") })),
+  relatedKeywords: z.array(z.object({ value: z.string() })).optional(),
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']),
   wordCount: z.number().min(600).max(2500),
   includePoints: z.boolean().default(false).optional(),
@@ -134,13 +134,10 @@ export default function BlogGeneratorForm() {
     setResult(null);
     resetCopyState();
     
-    // Filter out empty CTA
-    const cta = (values.cta?.link && values.cta?.prompt) ? values.cta : undefined;
-
     const submissionData = {
       ...values,
-      relatedKeywords: values.relatedKeywords.map(kw => kw.value),
-      cta: cta
+      relatedKeywords: values.relatedKeywords?.map(kw => kw.value).filter(Boolean),
+      cta: (values.cta?.link && values.cta?.prompt) ? values.cta : undefined,
     };
 
     try {
@@ -325,90 +322,6 @@ export default function BlogGeneratorForm() {
                 />
               </div>
 
-              <div>
-                <FormLabel>Related Keywords</FormLabel>
-                <div className="space-y-2 mt-2">
-                  {fields.map((field, index) => (
-                    <FormField
-                      control={form.control}
-                      key={field.id}
-                      name={`relatedKeywords.${index}.value`}
-                      render={({ field }) => (
-                        <FormItem className="flex items-center gap-2">
-                          <FormControl>
-                            <Input {...field} placeholder={`Related Keyword #${index + 1}`} />
-                          </FormControl>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => remove(index)}
-                          >
-                            <MinusCircle className="h-5 w-5 text-red-500" />
-                          </Button>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => append({ value: "" })}
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add Related Keyword
-                </Button>
-              </div>
-
-              <FormField
-                control={form.control}
-                name="wordCount"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex justify-between items-center">
-                      <FormLabel>Word Count</FormLabel>
-                      <span className="text-sm font-medium text-muted-foreground">{field.value} words</span>
-                    </div>
-                    <FormControl>
-                      <Slider
-                        min={600}
-                        max={2500}
-                        step={50}
-                        value={[field.value]}
-                        onValueChange={(vals) => field.onChange(vals[0])}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="includePoints"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        Include Bullet Points
-                      </FormLabel>
-                      <p className="text-sm text-muted-foreground">
-                        Add lists and bullet points in the blog post where appropriate.
-                      </p>
-                    </div>
-                  </FormItem>
-                )}
-              />
-
               {/* Advanced Options Toggle */}
               <div className="relative flex items-center justify-center my-4">
                 <Separator className="flex-1" />
@@ -433,6 +346,91 @@ export default function BlogGeneratorForm() {
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="space-y-8 overflow-hidden"
                 >
+                  <div>
+                    <FormLabel>Related Keywords</FormLabel>
+                    <div className="space-y-2 mt-2">
+                      {fields.map((field, index) => (
+                        <FormField
+                          control={form.control}
+                          key={field.id}
+                          name={`relatedKeywords.${index}.value`}
+                          render={({ field }) => (
+                            <FormItem className="flex items-center gap-2">
+                              <FormControl>
+                                <Input {...field} placeholder={`Related Keyword #${index + 1}`} />
+                              </FormControl>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => remove(index)}
+                              >
+                                <MinusCircle className="h-5 w-5 text-red-500" />
+                              </Button>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => append({ value: "" })}
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Add Related Keyword
+                    </Button>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="wordCount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex justify-between items-center">
+                          <FormLabel>Word Count</FormLabel>
+                          <span className="text-sm font-medium text-muted-foreground">{field.value} words</span>
+                        </div>
+                        <FormControl>
+                          <Slider
+                            min={600}
+                            max={2500}
+                            step={50}
+                            value={[field.value]}
+                            onValueChange={(vals) => field.onChange(vals[0])}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="includePoints"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>
+                            Include Bullet Points
+                          </FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            Add lists and bullet points in the blog post where appropriate.
+                          </p>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  
                   {/* CTA */}
                   <div className="space-y-4 rounded-md border p-4">
                      <h3 className="font-medium">Call to Action (CTA)</h3>
