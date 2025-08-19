@@ -17,7 +17,7 @@ const GenerateFacebookPostInputSchema = z.object({
 export type GenerateFacebookPostInput = z.infer<typeof GenerateFacebookPostInputSchema>;
 
 const GenerateFacebookPostOutputSchema = z.object({
-  post: z.string().describe('An engaging post for Facebook.'),
+  posts: z.array(z.string()).describe('An array of 5 engaging posts for Facebook.'),
 });
 export type GenerateFacebookPostOutput = z.infer<typeof GenerateFacebookPostOutputSchema>;
 
@@ -29,11 +29,11 @@ const prompt = ai.definePrompt({
   name: 'generateFacebookPostPrompt',
   input: {schema: GenerateFacebookPostInputSchema},
   output: {schema: GenerateFacebookPostOutputSchema},
-  prompt: `You are a social media expert. Generate an engaging Facebook post for the following description:
+  prompt: `You are a social media expert. Generate 5 distinct and engaging Facebook posts for the following description:
 
 Description: {{{postDescription}}}
 
-Post:`, 
+Return the posts as a JSON array of strings. Do not include any intro or explanation text. Just return the JSON.`, 
 });
 
 const generateFacebookPostFlow = ai.defineFlow(

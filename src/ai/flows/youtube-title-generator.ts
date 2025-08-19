@@ -15,7 +15,7 @@ const GenerateYoutubeTitleInputSchema = z.string().describe('A description of th
 export type GenerateYoutubeTitleInput = z.infer<typeof GenerateYoutubeTitleInputSchema>;
 
 const GenerateYoutubeTitleOutputSchema = z.object({
-  titles: z.array(z.string()).describe('An array of catchy YouTube video titles.'),
+  titles: z.array(z.string()).describe('An array of 5 catchy YouTube video titles.'),
 });
 export type GenerateYoutubeTitleOutput = z.infer<typeof GenerateYoutubeTitleOutputSchema>;
 
@@ -27,7 +27,7 @@ const prompt = ai.definePrompt({
   name: 'generateYoutubeTitlePrompt',
   input: {schema: GenerateYoutubeTitleInputSchema},
   output: {schema: GenerateYoutubeTitleOutputSchema},
-  prompt: `You are a YouTube SEO expert. Generate a list of 3 catchy and click-worthy titles for a video with the following description: {{{$input}}}
+  prompt: `You are a YouTube SEO expert. Generate a list of 5 catchy and click-worthy titles for a video with the following description: {{{$input}}}
 
   The titles should be optimized for search and entice users to click.
 

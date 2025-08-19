@@ -1,18 +1,16 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { handleGenerateFacebookPost } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Bot, Clipboard, ClipboardCheck } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { Clipboard } from "lucide-react";
 
 const initialState = {
-  post: "",
+  posts: [],
   message: "",
 };
 
@@ -20,7 +18,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="w-full">
-      {pending ? "Generating..." : "Generate Post"}
+      {pending ? "Generating..." : "Generate Posts"}
     </Button>
   );
 }
@@ -29,7 +27,6 @@ export default function FacebookPostGeneratorForm() {
   const [state, formAction] = useActionState(handleGenerateFacebookPost, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (state.message) {
@@ -39,23 +36,19 @@ export default function FacebookPostGeneratorForm() {
         description: state.message,
       });
     }
-    if (state.post) {
+    if (state.posts && state.posts.length > 0) {
       toast({
         title: "Success!",
-        description: "Your new post has been generated.",
+        description: "Your new posts have been generated.",
       });
     }
   }, [state, toast]);
 
-  const handleCopy = () => {
-    if (state.post) {
-      navigator.clipboard.writeText(state.post);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast({
-        description: "Post copied to clipboard.",
-      });
-    }
+  const copyPost = (post: string) => {
+    navigator.clipboard.writeText(post);
+    toast({
+      description: "Post copied to clipboard.",
+    });
   };
 
   return (
@@ -74,25 +67,23 @@ export default function FacebookPostGeneratorForm() {
           <SubmitButton />
         </form>
 
-        {state.post && (
+        {state.posts && state.posts.length > 0 && (
           <div className="mt-8">
-            <Alert>
-              <Bot className="h-4 w-4" />
-              <AlertTitle className="font-headline flex items-center justify-between">
-                Generated Post
-                <Button variant="ghost" size="icon" onClick={handleCopy}>
-                  {copied ? (
-                    <ClipboardCheck className="h-4 w-4" />
-                  ) : (
+            <h3 className="font-headline text-lg font-semibold mb-4">Generated Posts:</h3>
+            <ul className="space-y-3">
+              {state.posts.map((post: string, index: number) => (
+                <li
+                  key={index}
+                  className="flex items-center justify-between gap-3 p-3 rounded-md border bg-secondary/50"
+                >
+                  <span className="text-sm">{post}</span>
+                  <Button variant="ghost" size="icon" onClick={() => copyPost(post)}>
                     <Clipboard className="h-4 w-4" />
-                  )}
-                  <span className="sr-only">Copy post</span>
-                </Button>
-              </AlertTitle>
-              <AlertDescription className="pt-2">
-                <Textarea readOnly value={state.post} rows={5} className="mt-2 text-base"/>
-              </AlertDescription>
-            </Alert>
+                    <span className="sr-only">Copy post</span>
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </CardContent>

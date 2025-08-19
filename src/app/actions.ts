@@ -161,7 +161,7 @@ export async function handleGenerateFacebookPost(prevState: any, formData: FormD
   try {
     const result = await generateFacebookPost(validatedFields.data as GenerateFacebookPostInput);
     return {
-      post: result.post,
+      posts: result.posts,
     };
   } catch (error) {
     console.error(error);
