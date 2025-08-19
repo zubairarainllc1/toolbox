@@ -27,9 +27,7 @@ const prompt = ai.definePrompt({
   name: 'generateInstagramHashtagsPrompt',
   input: {schema: GenerateInstagramHashtagsInputSchema},
   output: {schema: GenerateInstagramHashtagsOutputSchema},
-  prompt: `You are a viral Instagram marketing expert. Your task is to generate 50 highly relevant and effective hashtags for a post based on the provided keywords.
-
-The user will provide a topic, for example, "car accident". You must generate hashtags that are directly related to a car accident, such as #carcrash, #accident, #caraccident, #ontheroad, etc.
+  prompt: `You are a viral Instagram marketing expert. Your task is to generate 50 highly relevant and effective hashtags for a post based on the provided topic.
 
 The hashtags must be a mix of popular, niche, and trending terms to maximize reach and engagement. Do not include generic or irrelevant hashtags.
 
