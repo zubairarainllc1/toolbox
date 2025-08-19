@@ -42,62 +42,23 @@ export default function AboutPage() {
         <div className="mt-24">
           <div className="text-center">
             <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">
-              Meet the Innovators
+              Meet the Inventor
             </h2>
             <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
-              The passionate minds behind the magic.
+              The passionate mind behind the magic.
             </p>
           </div>
-          <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <Card className="text-center">
+          <div className="mt-12 flex justify-center">
+            <Card className="text-center max-w-sm">
               <CardContent className="pt-6">
                  <Avatar className="w-24 h-24 mx-auto mb-4">
-                  <AvatarImage src="https://placehold.co/100x100.png" data-ai-hint="person face" />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarImage src="https://i.postimg.cc/Jh5qJNb2/profile.png" data-ai-hint="company logo" />
+                  <AvatarFallback>C</AvatarFallback>
                 </Avatar>
-                <h3 className="font-headline text-xl font-semibold">Jane Doe</h3>
-                <p className="text-primary">Founder & CEO</p>
+                <h3 className="font-headline text-xl font-semibold">Codexign LLC</h3>
+                <p className="text-primary">Founder, Lead AI, Product, Design & Development</p>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  The visionary who started it all, driven by a passion for technology and creativity.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="pt-6">
-                <Avatar className="w-24 h-24 mx-auto mb-4">
-                  <AvatarImage src="https://placehold.co/100x100.png" data-ai-hint="person" />
-                  <AvatarFallback>JS</AvatarFallback>
-                </Avatar>
-                <h3 className="font-headline text-xl font-semibold">John Smith</h3>
-                <p className="text-primary">Lead AI Engineer</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  The brilliant mind architecting the AI models that power our tools.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="pt-6">
-                <Avatar className="w-24 h-24 mx-auto mb-4">
-                  <AvatarImage src="https://placehold.co/100x100.png" data-ai-hint="woman face" />
-                  <AvatarFallback>EM</AvatarFallback>
-                </Avatar>
-                <h3 className="font-headline text-xl font-semibold">Emily White</h3>
-                <p className="text-primary">Head of Product</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Ensuring our tools are not only powerful but also intuitive and delightful to use.
-                </p>
-              </CardContent>
-            </Card>
-             <Card className="text-center">
-              <CardContent className="pt-6">
-                <Avatar className="w-24 h-24 mx-auto mb-4">
-                  <AvatarImage src="https://placehold.co/100x100.png" data-ai-hint="man face" />
-                  <AvatarFallback>CB</AvatarFallback>
-                </Avatar>
-                <h3 className="font-headline text-xl font-semibold">Chris Brown</h3>
-                <p className="text-primary">UX/UI Designer</p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  The creative force behind our clean, modern, and user-friendly design.
+                  The driving force behind Toolbox, handling everything from concept to code.
                 </p>
               </CardContent>
             </Card>
