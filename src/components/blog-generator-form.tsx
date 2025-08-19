@@ -81,6 +81,30 @@ export default function BlogGeneratorForm() {
     setSections([]);
   };
 
+  const parseSections = (blogPost: string) => {
+    const lines = blogPost.split('\n');
+    const newSections: string[] = [];
+    let currentContent = '';
+  
+    lines.forEach(line => {
+      if (line.match(/^#+\s/)) { // This is a heading
+        if (currentContent.trim()) {
+          newSections.push(currentContent.trim());
+        }
+        newSections.push(line.trim());
+        currentContent = '';
+      } else {
+        currentContent += line + '\n';
+      }
+    });
+  
+    if (currentContent.trim()) {
+      newSections.push(currentContent.trim());
+    }
+  
+    return newSections;
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setResult(null);
@@ -95,8 +119,7 @@ export default function BlogGeneratorForm() {
       const response = await handleGenerateBlogPost(submissionData);
       if (response.blogPost) {
         setResult(response.blogPost);
-        const splitSections = response.blogPost.split(/(?=\n#+\s)/).filter(s => s.trim() !== '');
-        setSections(splitSections);
+        setSections(parseSections(response.blogPost));
       } else if (response.message) {
         toast({
           variant: 'destructive',
@@ -135,7 +158,6 @@ export default function BlogGeneratorForm() {
     const sectionToCopy = sections[currentSectionIndex];
     copyToClipboard(sectionToCopy, `Section ${currentSectionIndex + 1} copied!`);
     
-    // Move to the next section, or loop back to the start
     setCurrentSectionIndex((prevIndex) => (prevIndex + 1) % sections.length);
   };
   
@@ -353,14 +375,14 @@ export default function BlogGeneratorForm() {
                     )}
                     {copiedAll ? 'Copied!' : 'Copy All'}
                   </Button>
-                   <Button variant="outline" size="sm" onClick={handleCopySection}>
+                   <Button variant="outline" size="sm" onClick={handleCopySection} disabled={sections.length === 0}>
                     <Copy className="mr-2 h-4 w-4" />
                     Copy Section by Section
                   </Button>
                 </div>
               </div>
               <div className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none p-6 rounded-md border bg-secondary/50">
-                 {sections.length > 0 ? (
+                 {isCopyingSections && sections.length > 0 ? (
                   sections.map((section, index) => (
                     <div 
                       key={index} 
