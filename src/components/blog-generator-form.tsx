@@ -146,6 +146,7 @@ export default function BlogGeneratorForm() {
       if (response.blogPost) {
         setResult(response);
         setSections(parseSections(response.blogPost));
+        setHighlightedSentences([]); // Clear highlights on new generation
       } else if (response.message) {
         toast({
           variant: 'destructive',
@@ -242,7 +243,6 @@ export default function BlogGeneratorForm() {
             const response = await handleParaphraseText({ text: sentence });
             if (response.rewrittenText) {
                 updatedPost = updatedPost.replace(sentence, response.rewrittenText);
-                setResult(prev => ({ ...prev!, blogPost: updatedPost }));
             } else {
                 toast({ variant: 'destructive', title: 'Error', description: `Could not rewrite: "${sentence}"`});
             }
@@ -250,39 +250,42 @@ export default function BlogGeneratorForm() {
             toast({ variant: 'destructive', title: 'Error', description: 'Failed to fix plagiarism.'});
         }
     }
+    setResult(prev => ({ ...prev!, blogPost: updatedPost }));
     setHighlightedSentences([]);
     setIsFixingPlagiarism(false);
     toast({ title: 'Success!', description: 'Plagiarism check complete and text updated.' });
   };
-
+  
   const handleMouseUp = useCallback(() => {
     const currentSelection = window.getSelection();
-    const selectedText = currentSelection?.toString().trim() ?? '';
+    if (!currentSelection) return;
+    
+    const selectedText = currentSelection.toString().trim();
   
-    if (selectedText.length > 0 && contentRef.current?.contains(currentSelection?.anchorNode ?? null)) {
-      const range = currentSelection?.getRangeAt(0);
-      if (range) {
-        const rect = range.getBoundingClientRect();
-        setPopoverPosition({
-            top: rect.top + window.scrollY - 40,
-            left: rect.left + window.scrollX + rect.width / 2 - 20,
-        });
-        setSelection({ text: selectedText, range });
-      }
+    if (selectedText.length > 5 && contentRef.current?.contains(currentSelection.anchorNode)) {
+      const range = currentSelection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      const contentRect = contentRef.current.getBoundingClientRect();
+
+      setPopoverPosition({
+        top: rect.top - contentRect.top - 45, // Position above selection
+        left: rect.left - contentRect.left + rect.width / 2, // Center of selection
+      });
+      setSelection({ text: selectedText, range });
     } else {
-      setSelection({ text: '', range: null });
+      // A brief delay to allow click on popover
+      setTimeout(() => setSelection({ text: '', range: null }), 100);
     }
   }, []);
 
   const handleRegenerateSelection = async () => {
-    if (!selection.text || !selection.range) return;
+    if (!selection.text || !result) return;
     setIsRegeneratingSelection(true);
     try {
         const response = await handleParaphraseText({ text: selection.text });
-        if (response.rewrittenText && result) {
+        if (response.rewrittenText) {
             const updatedBlog = result.blogPost.replace(selection.text, response.rewrittenText);
             setResult({ ...result, blogPost: updatedBlog });
-            setSelection({ text: '', range: null });
         } else {
             toast({ variant: 'destructive', title: 'Error', description: response.message || 'Failed to rewrite text.' });
         }
@@ -290,14 +293,61 @@ export default function BlogGeneratorForm() {
         toast({ variant: 'destructive', title: 'Error', description: 'An error occurred during regeneration.'});
     } finally {
         setIsRegeneratingSelection(false);
+        setSelection({ text: '', range: null }); // Hide popover after action
     }
+  };
+
+  const renderWithHighlights = (text: string) => {
+    if (highlightedSentences.length === 0) {
+      return <ReactMarkdown>{text}</ReactMarkdown>;
+    }
+  
+    const MainRegex = new RegExp(`(${highlightedSentences.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'g');
+    const parts = text.split(MainRegex);
+  
+    return (
+      <ReactMarkdown
+        components={{
+          p: ({ node, ...props }) => {
+            const content = React.Children.toArray(props.children);
+            if (typeof content[0] === 'string') {
+              const paragraphText = content[0];
+              const isParagraphHighlighted = highlightedSentences.some(s => paragraphText.includes(s));
+  
+              if (isParagraphHighlighted) {
+                const subParts = paragraphText.split(MainRegex);
+                return (
+                  <p className='bg-yellow-200/30 rounded-sm' {...props}>
+                    {subParts.map((part, i) =>
+                      highlightedSentences.includes(part) ? (
+                        <mark key={i} className="bg-orange-400/70 text-black rounded-sm px-1 py-0.5">
+                          {part}
+                        </mark>
+                      ) : (
+                        part
+                      )
+                    )}
+                  </p>
+                );
+              }
+            }
+            return <p {...props} />;
+          },
+        }}
+      >
+        {text}
+      </ReactMarkdown>
+    );
   };
 
 
   useEffect(() => {
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => document.removeEventListener('mouseup', handleMouseUp);
-  }, [handleMouseUp]);
+    const contentDiv = contentRef.current;
+    if (contentDiv) {
+        contentDiv.addEventListener('mouseup', handleMouseUp);
+        return () => contentDiv.removeEventListener('mouseup', handleMouseUp);
+    }
+  }, [handleMouseUp, result]);
 
 
   useEffect(() => {
@@ -372,7 +422,6 @@ export default function BlogGeneratorForm() {
                   )}
                 />
 
-              {/* Advanced Options Toggle */}
               <div className="relative flex items-center justify-center my-4">
                 <Separator className="flex-1" />
                 <Button 
@@ -386,7 +435,6 @@ export default function BlogGeneratorForm() {
                 <Separator className="flex-1" />
               </div>
 
-              {/* Advanced Options Section */}
               <AnimatePresence>
               {showAdvanced && (
                 <motion.div
@@ -420,7 +468,7 @@ export default function BlogGeneratorForm() {
                     </FormItem>
                   )}
                 />
-                  <div>
+                 <div>
                     <FormLabel>Related Keywords</FormLabel>
                     <div className="space-y-2 mt-2">
                       {fields.map((field, index) => (
@@ -573,17 +621,18 @@ export default function BlogGeneratorForm() {
                       <DialogHeader>
                         <DialogTitle>Plagiarism Checker</DialogTitle>
                       </DialogHeader>
-                      <div className="flex gap-2">
-                        <div className="flex-shrink-0 text-right text-muted-foreground pt-2">
-                          {plagiarismText.split('\n').map((_, i) => (
-                            <div key={i}>{i+1}</div>
-                          ))}
+                      <div className="relative">
+                        <div className="absolute left-2 top-2.5 text-right text-muted-foreground text-sm flex flex-col gap-[7px] select-none">
+                            {plagiarismText.split('\n').map((_, i) => (
+                                <div key={i}>{i+1}</div>
+                            ))}
                         </div>
                         <Textarea 
-                          value={plagiarismText} 
-                          onChange={(e) => setPlagiarismText(e.target.value)}
-                          placeholder="Paste text here, one sentence per line..."
-                          rows={10}
+                            value={plagiarismText} 
+                            onChange={(e) => setPlagiarismText(e.target.value)}
+                            placeholder="Paste text here, one sentence per line..."
+                            rows={10}
+                            className="pl-8"
                         />
                       </div>
                       <DialogFooter>
@@ -608,7 +657,6 @@ export default function BlogGeneratorForm() {
               <div 
                 ref={contentRef}
                 className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none p-6 rounded-md border bg-secondary/50 relative"
-                onMouseUp={handleMouseUp}
               >
                 {isCopyingSections && sections.length > 0 ? (
                   sections.map((section, index) => (
@@ -623,32 +671,32 @@ export default function BlogGeneratorForm() {
                     </div>
                   ))
                 ) : (
-                  <ReactMarkdown
-                    components={{
-                        p: ({node, ...props}) => {
-                            const text = node?.children[0]?.type === 'text' ? node.children[0].value : '';
-                            const isHighlighted = highlightedSentences.some(s => text.includes(s));
-                            return <p className={cn(isHighlighted && 'bg-yellow-400/30 rounded-sm')} {...props}/>
-                        },
-                        h1: ({node, ...props}) => {
-                            const text = node?.children[0]?.type === 'text' ? node.children[0].value : '';
-                            const isHighlighted = highlightedSentences.some(s => text.includes(s));
-                            return <h1 className={cn(isHighlighted && 'bg-yellow-400/30 rounded-sm')} {...props}/>
-                        },
-                        h2: ({node, ...props}) => {
-                            const text = node?.children[0]?.type === 'text' ? node.children[0].value : '';
-                            const isHighlighted = highlightedSentences.some(s => text.includes(s));
-                            return <h2 className={cn(isHighlighted && 'bg-yellow-400/30 rounded-sm')} {...props}/>
-                        },
-                         h3: ({node, ...props}) => {
-                            const text = node?.children[0]?.type === 'text' ? node.children[0].value : '';
-                            const isHighlighted = highlightedSentences.some(s => text.includes(s));
-                            return <h3 className={cn(isHighlighted && 'bg-yellow-400/30 rounded-sm')} {...props}/>
-                        },
-                    }}
+                   renderWithHighlights(result.blogPost)
+                )}
+
+                {selection.text && (
+                  <div
+                    className="absolute z-10"
+                    style={{ 
+                      top: popoverPosition.top, 
+                      left: popoverPosition.left,
+                      transform: 'translateX(-50%)',
+                     }}
                   >
-                    {result.blogPost}
-                  </ReactMarkdown>
+                    <Button
+                      size="sm"
+                      className="shadow-lg"
+                      onClick={handleRegenerateSelection}
+                      disabled={isRegeneratingSelection}
+                    >
+                      {isRegeneratingSelection ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Bot className="mr-2 h-4 w-4" />
+                      )}
+                      Regenerate
+                    </Button>
+                  </div>
                 )}
               </div>
                 <div className="mt-8 flex justify-center">
@@ -669,33 +717,6 @@ export default function BlogGeneratorForm() {
           )}
         </CardContent>
       </Card>
-
-      <AnimatePresence>
-        {selection.text && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.1 }}
-              className="absolute z-10"
-              style={{ top: popoverPosition.top, left: popoverPosition.left }}
-            >
-              <Button
-                size="sm"
-                className="shadow-lg"
-                onClick={handleRegenerateSelection}
-                disabled={isRegeneratingSelection}
-              >
-                {isRegeneratingSelection ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Bot className="mr-2 h-4 w-4" />
-                )}
-                Regenerate
-              </Button>
-            </motion.div>
-        )}
-      </AnimatePresence>
 
       <AnimatePresence>
         {highlightedSentences.length > 0 && (
