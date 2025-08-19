@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { UploadCloud, Download, AspectRatio } from 'lucide-react';
+import { UploadCloud, Download } from 'lucide-react';
 import { Label } from './ui/label';
 import Image from 'next/image';
+import { Slider } from './ui/slider';
 
 export default function ImageResizer() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -18,6 +19,8 @@ export default function ImageResizer() {
   const [width, setWidth] = useState<number | ''>('');
   const [height, setHeight] = useState<number | ''>('');
   const [keepAspectRatio, setKeepAspectRatio] = useState(true);
+  const [scale, setScale] = useState(100);
+  const originalDimensions = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
   const originalAspectRatio = useRef<number>(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -42,14 +45,16 @@ export default function ImageResizer() {
       }
       setSelectedFile(file);
       setResizedUrl(null);
+      setScale(100);
       
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new window.Image();
         img.onload = () => {
+          originalDimensions.current = { width: img.width, height: img.height };
+          originalAspectRatio.current = img.width / img.height;
           setWidth(img.width);
           setHeight(img.height);
-          originalAspectRatio.current = img.width / img.height;
         };
         img.src = e.target?.result as string;
         setPreviewUrl(e.target?.result as string);
@@ -61,6 +66,9 @@ export default function ImageResizer() {
   const handleWidthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newWidth = e.target.value === '' ? '' : parseInt(e.target.value, 10);
     setWidth(newWidth);
+    if (originalDimensions.current.width > 0) {
+        setScale(newWidth === '' ? 0 : Math.round((newWidth / originalDimensions.current.width) * 100));
+    }
     if (keepAspectRatio && newWidth !== '' && originalAspectRatio.current) {
       setHeight(Math.round(newWidth / originalAspectRatio.current));
     }
@@ -70,7 +78,23 @@ export default function ImageResizer() {
     const newHeight = e.target.value === '' ? '' : parseInt(e.target.value, 10);
     setHeight(newHeight);
     if (keepAspectRatio && newHeight !== '' && originalAspectRatio.current) {
-      setWidth(Math.round(newHeight * originalAspectRatio.current));
+      const newWidth = Math.round(newHeight * originalAspectRatio.current);
+      setWidth(newWidth);
+      if (originalDimensions.current.width > 0) {
+        setScale(newWidth === '' ? 0 : Math.round((newWidth / originalDimensions.current.width) * 100));
+      }
+    }
+  };
+
+  const handleScaleChange = (newScale: number[]) => {
+    const scaleValue = newScale[0];
+    setScale(scaleValue);
+    if(originalDimensions.current.width > 0) {
+      const newWidth = Math.round(originalDimensions.current.width * (scaleValue / 100));
+      setWidth(newWidth);
+      if (keepAspectRatio) {
+          setHeight(Math.round(newWidth / originalAspectRatio.current));
+      }
     }
   };
 
@@ -150,6 +174,21 @@ export default function ImageResizer() {
                         <Label htmlFor="height">Height</Label>
                         <Input id="height" type="number" value={height} onChange={handleHeightChange} placeholder="e.g. 1080"/>
                     </div>
+                </div>
+                <div className="space-y-2">
+                  <div className='flex justify-between items-center'>
+                    <Label htmlFor="scale">Scale</Label>
+                    <span className="text-sm font-medium text-muted-foreground">{scale}%</span>
+                  </div>
+                  <Slider
+                    id="scale"
+                    min={1}
+                    max={200}
+                    step={1}
+                    value={[scale]}
+                    onValueChange={handleScaleChange}
+                    disabled={!keepAspectRatio}
+                  />
                 </div>
                 <div className="flex items-center space-x-2">
                     <input type="checkbox" id="aspect-ratio" checked={keepAspectRatio} onChange={(e) => setKeepAspectRatio(e.target.checked)} className="form-checkbox h-4 w-4 text-primary transition duration-150 ease-in-out" />
