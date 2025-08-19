@@ -13,12 +13,12 @@ export default function Home() {
             <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl animate-gradient bg-gradient-to-r from-primary via-blue-400 to-purple-500 bg-clip-text text-transparent bg-300% animate-gradient">
               Your Ultimate Digital Toolbox
             </h1>
-            <p className="mx-auto mt-6 max-w-[700px] text-lg text-muted-foreground md:text-xl">
+            <p className="mx-auto mt-8 max-w-[700px] text-lg text-muted-foreground md:text-xl">
               Supercharge your workflow with our collection of AI-powered tools. From social media to productivity, we've got you covered.
             </p>
-            <div className="mt-10 flex flex-col items-center gap-6">
+            <div className="mt-12 flex flex-col items-center gap-8">
               <ToolSearch />
-              <Link href="/tools" className="mt-4">
+              <Link href="/tools">
                 <Button size="lg">
                   Explore All Tools
                   <ArrowRight className="ml-2 h-5 w-5" />
