@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Clipboard } from "lucide-react";
 
@@ -30,6 +30,11 @@ export default function InstagramHashtagGeneratorForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const [selectedHashtags, setSelectedHashtags] = useState<string[]>([]);
+  
+  const uniqueHashtags = useMemo(() => {
+    if (!state.hashtags) return [];
+    return [...new Set(state.hashtags)];
+  }, [state.hashtags]);
 
   useEffect(() => {
     if (state.message) {
@@ -66,8 +71,8 @@ export default function InstagramHashtagGeneratorForm() {
   };
 
   const copyAll = () => {
-    if (state.hashtags && state.hashtags.length > 0) {
-      const allHashtags = state.hashtags.join(" ");
+    if (uniqueHashtags.length > 0) {
+      const allHashtags = uniqueHashtags.join(" ");
       navigator.clipboard.writeText(allHashtags);
       toast({
         description: "All hashtags copied to clipboard!",
@@ -91,7 +96,7 @@ export default function InstagramHashtagGeneratorForm() {
           <SubmitButton />
         </form>
 
-        {state.hashtags && state.hashtags.length > 0 && (
+        {uniqueHashtags.length > 0 && (
           <div className="mt-8">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-headline text-lg font-semibold">Generated Hashtags:</h3>
@@ -101,7 +106,7 @@ export default function InstagramHashtagGeneratorForm() {
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {state.hashtags.map((tag: string) => (
+              {uniqueHashtags.map((tag: string) => (
                 <Badge
                   key={tag}
                   variant={selectedHashtags.includes(tag) ? "default" : "secondary"}
@@ -115,7 +120,7 @@ export default function InstagramHashtagGeneratorForm() {
           </div>
         )}
       </CardContent>
-      {state.hashtags && state.hashtags.length > 0 && (
+      {uniqueHashtags.length > 0 && (
         <CardFooter>
           <Button variant="outline" onClick={copyAll} className="w-full">
             Copy All
