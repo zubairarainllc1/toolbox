@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { tools, type Tool } from "@/lib/tools";
 import Link from "next/link";
 import {
@@ -19,6 +18,7 @@ export default function ToolSearch() {
   const [query, setQuery] = useState("");
   const [filteredTools, setFilteredTools] = useState<Tool[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (query.length > 0) {
@@ -36,22 +36,36 @@ export default function ToolSearch() {
       setIsOpen(false);
     }
   }, [query]);
-  
+
   const handleSelect = useCallback(() => {
     setQuery("");
     setFilteredTools([]);
     setIsOpen(false);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="relative w-full max-w-lg">
+    <div className="relative w-full max-w-lg" ref={searchContainerRef}>
       <Command className="rounded-lg border shadow-md">
         <CommandInput
           placeholder="Search for a tool... (e.g. hashtag)"
           value={query}
           onValueChange={setQuery}
           onFocus={() => query.length > 0 && setIsOpen(true)}
-          onBlur={() => setTimeout(() => setIsOpen(false), 100)}
         />
         <AnimatePresence>
           {isOpen && (
@@ -59,14 +73,17 @@ export default function ToolSearch() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full mt-2 w-full"
+              className="absolute top-full mt-2 w-full z-10"
             >
               <CommandList className="rounded-lg border bg-background shadow-md">
                 {filteredTools.length > 0 ? (
                   <CommandGroup heading="Tools">
                     {filteredTools.map((tool) => (
                       <Link href={tool.href} key={tool.href} passHref>
-                        <CommandItem onSelect={handleSelect} className="cursor-pointer">
+                        <CommandItem
+                          onSelect={handleSelect}
+                          className="cursor-pointer"
+                        >
                           <tool.icon className="mr-2 h-4 w-4" />
                           <span>{tool.title}</span>
                         </CommandItem>

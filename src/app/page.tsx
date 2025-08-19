@@ -22,7 +22,7 @@ export default function Home() {
             <div className="mt-12 flex flex-col items-center gap-4">
               <ToolSearch />
                <Link href="/tools">
-                  <Button variant="link">
+                  <Button>
                     Explore All Tools
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
