@@ -11,6 +11,8 @@ import {
   Type,
   Hash,
   Lightbulb,
+  QrCode,
+  KeyRound,
 } from "lucide-react";
 import * as React from 'react';
 
@@ -59,6 +61,20 @@ export const tools: Tool[] = [
     description: "Quickly resize your images to the perfect dimensions.",
     href: "/tools/image-resizer",
     icon: Scissors,
+    category: "Productive Tools",
+  },
+  {
+    title: "QR Code Generator",
+    description: "Generate a QR code from a URL or text.",
+    href: "/tools/qr-code-generator",
+    icon: QrCode,
+    category: "Productive Tools",
+  },
+  {
+    title: "Password Generator",
+    description: "Create strong, secure, and random passwords.",
+    href: "/tools/password-generator",
+    icon: KeyRound,
     category: "Productive Tools",
   },
   // Instagram
