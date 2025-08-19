@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Sparkles, Clipboard, Check } from 'lucide-react';
+import { Loader2, Sparkles, Clipboard, Check, PlusCircle, MinusCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -27,14 +27,19 @@ import { useToast } from '@/hooks/use-toast';
 import { handleGenerateBlogPost } from '@/app/actions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Slider } from './ui/slider';
+import { Checkbox } from './ui/checkbox';
 
 const formSchema = z.object({
   topic: z
     .string()
     .min(10, 'Please enter a topic with at least 10 characters.'),
-  keywords: z.string().optional(),
+  mainKeyword: z
+    .string()
+    .min(3, 'Please enter a main keyword with at least 3 characters.'),
+  relatedKeywords: z.array(z.object({ value: z.string().min(1, "Related keyword cannot be empty.") })),
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']),
   wordCount: z.number().min(600).max(2500),
+  includePoints: z.boolean().default(false).optional(),
 });
 
 export default function BlogGeneratorForm() {
@@ -47,18 +52,31 @@ export default function BlogGeneratorForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       topic: '',
-      keywords: '',
+      mainKeyword: '',
+      relatedKeywords: [],
       tone: 'informative',
       wordCount: 1000,
+      includePoints: false,
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "relatedKeywords",
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setResult(null);
     setCopied(false);
+    
+    const submissionData = {
+        ...values,
+        relatedKeywords: values.relatedKeywords.map(kw => kw.value)
+    };
+
     try {
-      const response = await handleGenerateBlogPost(values);
+      const response = await handleGenerateBlogPost(submissionData);
       if (response.blogPost) {
         setResult(response.blogPost);
       } else if (response.message) {
@@ -118,48 +136,88 @@ export default function BlogGeneratorForm() {
                 </FormItem>
               )}
             />
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
                 control={form.control}
-                name="keywords"
+                name="mainKeyword"
                 render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Keywords (Optional)</FormLabel>
+                  <FormItem>
+                    <FormLabel>Main Keyword</FormLabel>
                     <FormControl>
-                        <Input
-                        placeholder="e.g., SEO, content marketing, social media"
+                      <Input
+                        placeholder="e.g., SEO, content marketing"
                         {...field}
-                        />
+                      />
                     </FormControl>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
-                <FormField
+              />
+              <FormField
                 control={form.control}
                 name="tone"
                 render={({ field }) => (
-                    <FormItem>
+                  <FormItem>
                     <FormLabel>Tone of Voice</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
+                      <FormControl>
                         <SelectTrigger>
-                            <SelectValue placeholder="Select a tone" />
+                          <SelectValue placeholder="Select a tone" />
                         </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
+                      </FormControl>
+                      <SelectContent>
                         <SelectItem value="informative">Informative</SelectItem>
                         <SelectItem value="professional">Professional</SelectItem>
                         <SelectItem value="casual">Casual</SelectItem>
                         <SelectItem value="funny">Funny</SelectItem>
                         <SelectItem value="inspirational">Inspirational</SelectItem>
-                        </SelectContent>
+                      </SelectContent>
                     </Select>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
+              />
             </div>
+
+            <div>
+              <FormLabel>Related Keywords</FormLabel>
+              <div className="space-y-2 mt-2">
+                {fields.map((field, index) => (
+                  <FormField
+                    control={form.control}
+                    key={field.id}
+                    name={`relatedKeywords.${index}.value`}
+                    render={({ field }) => (
+                      <FormItem className="flex items-center gap-2">
+                        <FormControl>
+                          <Input {...field} placeholder={`Related Keyword #${index + 1}`} />
+                        </FormControl>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => remove(index)}
+                        >
+                          <MinusCircle className="h-5 w-5 text-red-500" />
+                        </Button>
+                         <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => append({ value: "" })}
+              >
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add Related Keyword
+              </Button>
+            </div>
+
             <FormField
               control={form.control}
               name="wordCount"
@@ -182,6 +240,29 @@ export default function BlogGeneratorForm() {
                 </FormItem>
               )}
             />
+             <FormField
+              control={form.control}
+              name="includePoints"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      Include Bullet Points
+                    </FormLabel>
+                     <p className="text-sm text-muted-foreground">
+                       Add lists and bullet points in the blog post where appropriate.
+                    </p>
+                  </div>
+                </FormItem>
+              )}
+            />
+
             <Button
               type="submit"
               disabled={isLoading}
@@ -200,7 +281,7 @@ export default function BlogGeneratorForm() {
           <div className="text-center p-8 space-y-4">
             <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
             <p className="text-muted-foreground font-medium">
-              Writing your blog post...
+              Writing your SEO-optimized blog post...
             </p>
             <p className="text-sm text-muted-foreground">This may take up to a minute. Please wait.</p>
           </div>

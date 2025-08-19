@@ -12,10 +12,12 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const GenerateBlogPostInputSchema = z.object({
-  topic: z.string().describe('The main topic or title for the blog post.'),
-  keywords: z.string().optional().describe('Comma-separated keywords to include for SEO.'),
+  topic: z.string().describe('The main topic for the blog post.'),
+  mainKeyword: z.string().describe('The primary SEO keyword for the blog post.'),
+  relatedKeywords: z.array(z.string()).optional().describe('A list of related keywords to include for SEO.'),
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']).describe('The desired tone for the blog post.'),
   wordCount: z.number().min(600).max(2500).describe('The desired word count for the blog post.'),
+  includePoints: z.boolean().optional().describe('Whether or not to include bullet points in the blog post.'),
 });
 export type GenerateBlogPostInput = z.infer<typeof GenerateBlogPostInputSchema>;
 
@@ -34,19 +36,60 @@ const prompt = ai.definePrompt({
   name: 'generateBlogPostPrompt',
   input: { schema: GenerateBlogPostInputSchema },
   output: { schema: GenerateBlogPostOutputSchema },
-  prompt: `You are an expert content writer and SEO specialist. Generate a well-structured and engaging blog post based on the following details.
+  prompt: `You are an expert content writer and SEO specialist. Generate a well-structured, SEO-friendly, and engaging blog post based on the following details.
 
-The blog post should be approximately {{{wordCount}}} words long and formatted in Markdown. It must include a compelling title, an introduction, a body with multiple sections using headings (H2, H3), and a conclusion.
-
-Topic/Title: {{{topic}}}
-Tone: {{{tone}}}
-Word Count: {{{wordCount}}}
-{{#if keywords}}
-Incorporate the following keywords naturally throughout the text: {{{keywords}}}
+**Blog Post Requirements:**
+- Topic: {{{topic}}}
+- Main Keyword: {{{mainKeyword}}}
+{{#if relatedKeywords}}
+- Related Keywords: {{{relatedKeywords}}}
+{{/if}}
+- Tone: {{{tone}}}
+- Word Count: Approximately {{{wordCount}}} words.
+{{#if includePoints}}
+- Include bulleted lists where it makes sense to break up content.
 {{/if}}
 
-Return the complete blog post as a single Markdown string in the 'blogPost' field of the JSON output.`,
+**Strict SEO Structure to Follow:**
+
+1.  **Title (H1):**
+    - Must be clear, catchy, and include the main keyword: "{{{mainKeyword}}}".
+    - Example Format: "Best SEO Blog Structure: Rank on Google in 2025"
+
+2.  **Introduction:**
+    - Length: 100–150 words.
+    - Must start with a strong hook to engage the reader.
+    - Must use the main keyword "{{{mainKeyword}}}" exactly once.
+
+3.  **Headings (H2, H3, H4):**
+    - Divide the blog post into logical sections using H2 headings for main topics and H3/H4 for sub-topics.
+    - Each H2 heading should ideally contain the main keyword or a primary related keyword.
+    - Use related keywords in H3/H4 headings where natural.
+
+4.  **Body Content:**
+    - Must be detailed and easy to read.
+    - Natural Keyword Placement:
+        - Use the main keyword "{{{mainKeyword}}}" approximately every 150-200 words. Do not force it.
+        - Naturally incorporate LSI keywords (the provided related keywords) throughout the text.
+    - Readability: Add a line break after approximately every 35 words to create shorter paragraphs.
+    {{#if includePoints}}
+    - Lists: Use bullet points or numbered lists to present information clearly where appropriate (e.g., for steps, tips, or examples).
+    {{/if}}
+
+5. **Keyword Placement Summary:**
+    - Title (H1): Once.
+    - Introduction: Once.
+    - First H2 Heading: Once.
+    - Body: Naturally, every 150-200 words.
+    - Conclusion: Once.
+
+6.  **Conclusion:**
+    - A brief summary of the main points.
+    - Must include the main keyword "{{{mainKeyword}}}" once.
+
+Return the complete blog post as a single Markdown string in the 'blogPost' field of the JSON output. Do not add any introductory text before the H1 title.`,
 });
+
 
 const generateBlogPostFlow = ai.defineFlow(
   {

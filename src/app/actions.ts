@@ -96,9 +96,11 @@ const tiktokVideoIdeasSchema = z.object({
 
 const blogPostSchema = z.object({
   topic: z.string().min(10, 'Please enter a topic with at least 10 characters.'),
-  keywords: z.string().optional(),
+  mainKeyword: z.string().min(3, 'Please enter a main keyword.'),
+  relatedKeywords: z.array(z.string()).optional(),
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']),
   wordCount: z.coerce.number().min(600).max(2500),
+  includePoints: z.boolean().optional(),
 });
 
 
