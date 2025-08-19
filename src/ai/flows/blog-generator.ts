@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -119,7 +120,7 @@ const prompt = ai.definePrompt({
     {{#if includePoints}}
     - Lists: Use bullet points or numbered lists to present information clearly where appropriate (e.g., for steps, tips, or examples).
     {{/if}}
-    - Linking: Integrate the provided internal and external links using Markdown format like [Anchor Text](URL). The placement should be natural and contextually relevant.
+    - Linking: Integrate the provided internal and external links using Markdown format like [Anchor Text](URL). The placement should be natural and contextually relevant based on the linking prompts provided.
 
 5. **Keyword Placement Summary:**
     - Title (H1): Once.
