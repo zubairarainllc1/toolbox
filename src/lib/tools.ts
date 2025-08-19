@@ -101,10 +101,10 @@ export const tools: Tool[] = [
   },
   // Facebook
   {
-    title: "Facebook Caption Generator",
-    description: "Generate compelling posts to engage your audience.",
-    href: "/tools/facebook-caption-generator",
-    icon: Type,
+    title: "Facebook Hashtag Generator",
+    description: "Generate viral hashtags to boost your reach.",
+    href: "/tools/facebook-hashtag-generator",
+    icon: Hash,
     category: "Facebook",
   },
   // X (Twitter)
