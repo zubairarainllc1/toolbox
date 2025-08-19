@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, Clipboard } from 'lucide-react';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -25,10 +25,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { generateTikTokTitle } from '@/ai/flows/tiktok-title-generator';
-import { GeneratedContent } from './GeneratedContent';
+import { handleGenerateTikTokTitle } from '@/app/actions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Slider } from './ui/slider';
 
 const TikTokIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
   React.createElement('svg', {
@@ -48,7 +46,6 @@ const formSchema = z.object({
     .min(3, 'Please enter a topic with at least 3 characters.'),
   keywords: z.string().optional(),
   tone: z.enum(['professional', 'casual', 'funny', 'inspirational', 'witty', 'informative']),
-  quantity: z.number().min(1).max(10),
 });
 
 type TikTokResult = {
@@ -66,7 +63,6 @@ export function TikTokTitleTool() {
       topic: '',
       keywords: '',
       tone: 'informative',
-      quantity: 3,
     },
   });
 
@@ -74,7 +70,7 @@ export function TikTokTitleTool() {
     setIsLoading(true);
     setResult(null);
     try {
-      const response = await generateTikTokTitle(values);
+      const response = await handleGenerateTikTokTitle(values);
       if(response.titles) {
         setResult(response);
       } else {
@@ -95,6 +91,13 @@ export function TikTokTitleTool() {
       setIsLoading(false);
     }
   }
+
+  const copyTitle = (title: string) => {
+    navigator.clipboard.writeText(title);
+    toast({
+      description: 'Title copied to clipboard!',
+    });
+  };
 
   return (
     <Card>
@@ -158,24 +161,6 @@ export function TikTokTitleTool() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="quantity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Number of Titles: {field.value}</FormLabel>
-                  <FormControl>
-                    <Slider
-                      min={1}
-                      max={10}
-                      step={1}
-                      defaultValue={[field.value]}
-                      onValueChange={(value) => field.onChange(value[0])}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
             <Button type="submit" disabled={isLoading} className="w-full md:w-auto bg-foreground text-background hover:bg-foreground/80">
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -193,8 +178,23 @@ export function TikTokTitleTool() {
             </div>
         )}
         {result && (
-          <div className="mt-8 space-y-6">
-            <GeneratedContent title="Generated Titles" items={result.titles} variant="paragraph" />
+          <div className="mt-8">
+            <h3 className="font-headline text-lg font-semibold mb-4">Generated Titles:</h3>
+            <ul className="space-y-3">
+              {result.titles.map((title: string, index: number) => (
+                <li
+                  key={index}
+                  className="flex items-center justify-between gap-3 p-3 rounded-md border bg-secondary/50 cursor-pointer transition-colors hover:bg-secondary"
+                  onClick={() => copyTitle(title)}
+                >
+                  <span className="text-sm flex-grow">{title}</span>
+                   <Button variant="ghost" size="icon">
+                    <Clipboard className="h-4 w-4" />
+                    <span className="sr-only">Copy title</span>
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </CardContent>

@@ -69,7 +69,6 @@ const tiktokTitleSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
   keywords: z.string().optional(),
   tone: z.enum(['professional', 'casual', 'funny', 'inspirational', 'witty', 'informative']),
-  quantity: z.coerce.number().min(1).max(10),
 });
 
 const youtubeContentIdeasSchema = z.object({
