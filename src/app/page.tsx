@@ -21,13 +21,12 @@ export default function Home() {
             </p>
             <div className="mt-12 flex flex-col items-center gap-4">
               <ToolSearch />
-              <p className="text-xs text-muted-foreground">
-                Or,{' '}
-                <Link href="/tools" className="underline hover:text-primary">
-                  explore all tools
+               <Link href="/tools">
+                  <Button variant="link">
+                    Explore All Tools
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
                 </Link>
-                .
-              </p>
             </div>
           </div>
         </div>
