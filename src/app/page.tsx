@@ -18,7 +18,7 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-col items-center gap-4">
               <ToolSearch />
-              <Link href="/tools">
+              <Link href="/tools" className="mt-2">
                 <Button size="lg">
                   Explore All Tools
                   <ArrowRight className="ml-2 h-5 w-5" />
