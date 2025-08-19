@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Sparkles, Instagram } from 'lucide-react';
+import { Loader2, Sparkles, Instagram, Clipboard } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,20 +24,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { generateInstagramCaptions } from '@/ai/flows/generate-instagram-captions';
-import { GeneratedContent } from '@/components/GeneratedContent';
-import { Slider } from '@/components/ui/slider';
 
 const formSchema = z.object({
   topic: z
     .string()
     .min(3, 'Please enter a topic with at least 3 characters.'),
-  contentType: z.enum(['photo', 'video'], {
-    required_error: 'You need to select a content type.',
-  }),
-  quantity: z.number().min(1).max(10),
 });
 
 type InstagramResult = {
@@ -53,8 +46,6 @@ export default function InstagramCaptionGeneratorForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       topic: '',
-      contentType: 'photo',
-      quantity: 5,
     },
   });
 
@@ -76,6 +67,13 @@ export default function InstagramCaptionGeneratorForm() {
     }
   }
 
+  const copyCaption = (caption: string) => {
+    navigator.clipboard.writeText(caption);
+    toast({
+      description: 'Caption copied to clipboard!',
+    });
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -92,59 +90,11 @@ export default function InstagramCaptionGeneratorForm() {
               name="topic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Topic / Niche</FormLabel>
+                  <FormLabel>Topic / Keyword</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., Healthy Recipes, DIY Home Decor" {...field} />
                   </FormControl>
                   <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="contentType"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Content Type</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-col space-y-1"
-                    >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="photo" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Photo</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="video" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Video (Reel/Story)</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="quantity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Number of Captions: {field.value}</FormLabel>
-                  <FormControl>
-                    <Slider
-                      min={1}
-                      max={10}
-                      step={1}
-                      defaultValue={[field.value]}
-                      onValueChange={(value) => field.onChange(value[0])}
-                    />
-                  </FormControl>
                 </FormItem>
               )}
             />
@@ -165,8 +115,23 @@ export default function InstagramCaptionGeneratorForm() {
             </div>
         )}
         {result && (
-          <div className="mt-8 space-y-6">
-            <GeneratedContent title="Generated Captions" items={result.captions} variant="paragraph" />
+          <div className="mt-8">
+            <h3 className="font-headline text-lg font-semibold mb-4">Generated Captions:</h3>
+            <ul className="space-y-3">
+              {result.captions.map((caption: string, index: number) => (
+                <li
+                  key={index}
+                  className="flex items-center justify-between gap-3 p-3 rounded-md border bg-secondary/50"
+                  onClick={() => copyCaption(caption)}
+                >
+                  <span className="text-sm flex-grow">{caption}</span>
+                   <Button variant="ghost" size="icon">
+                    <Clipboard className="h-4 w-4" />
+                    <span className="sr-only">Copy caption</span>
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </CardContent>

@@ -12,15 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const GenerateInstagramCaptionsInputSchema = z.object({
-  topic: z.string().describe('The topic or niche for the post.'),
-  contentType: z
-    .enum(['photo', 'video'])
-    .describe('The type of content (photo or video).'),
-  quantity: z
-    .number()
-    .min(1)
-    .max(10)
-    .describe('The number of captions to generate.'),
+  topic: z.string().describe('The topic or keyword for the social media post.'),
 });
 export type GenerateInstagramCaptionsInput = z.infer<
   typeof GenerateInstagramCaptionsInputSchema
@@ -29,7 +21,7 @@ export type GenerateInstagramCaptionsInput = z.infer<
 const GenerateInstagramCaptionsOutputSchema = z.object({
   captions: z
     .array(z.string())
-    .describe('An array of generated Instagram captions.'),
+    .describe('An array of 5 generated Instagram captions.'),
 });
 export type GenerateInstagramCaptionsOutput = z.infer<
   typeof GenerateInstagramCaptionsOutputSchema
@@ -45,7 +37,7 @@ const prompt = ai.definePrompt({
   name: 'generateInstagramCaptionsPrompt',
   input: { schema: GenerateInstagramCaptionsInputSchema },
   output: { schema: GenerateInstagramCaptionsOutputSchema },
-  prompt: `You are a viral Instagram marketing expert. Generate {{{quantity}}} unique and engaging Instagram captions for a {{{contentType}}} post about "{{{topic}}}".
+  prompt: `You are a viral Instagram marketing expert. Generate 5 unique and engaging Instagram captions for a post about "{{{topic}}}".
 
 The captions should be creative, relevant, and encourage interaction. Do not include any emojis or hashtags.
 
