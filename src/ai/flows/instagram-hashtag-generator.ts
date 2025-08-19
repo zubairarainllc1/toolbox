@@ -27,18 +27,16 @@ const prompt = ai.definePrompt({
   name: 'generateInstagramHashtagsPrompt',
   input: {schema: GenerateInstagramHashtagsInputSchema},
   output: {schema: GenerateInstagramHashtagsOutputSchema},
-  prompt: `You are an expert social media manager specializing in generating relevant and trending hashtags for Instagram posts.
+  prompt: `You are a viral Instagram marketing expert. Your task is to generate 50 highly relevant and effective hashtags for a post based on the provided keywords.
 
-  Generate a list of 50 hashtags based on the following description or keywords: {{{$input}}}
+The user will provide a topic, for example, "car accident". You must generate hashtags that are directly related to a car accident, such as #carcrash, #accident, #caraccident, #ontheroad, etc.
 
-  The hashtags must be highly relevant to the provided keywords and should be effective at increasing post visibility.
+The hashtags must be a mix of popular, niche, and trending terms to maximize reach and engagement. Do not include generic or irrelevant hashtags.
 
-  Return the hashtags as a JSON array of strings.  Do not include any intro or explanation text.  Just return the JSON.  Do not include a backtick code fence.
+Topic: {{{$input}}}
 
-  Example output:
-  {
-    "hashtags": ["#example", "#hashtag", "#socialmedia"]
-  }`,
+Generate 50 hashtags. Return them as a JSON array of strings. Do not include any intro or explanation text. Just return the JSON. Do not include a backtick code fence.
+`,
 });
 
 const generateInstagramHashtagsFlow = ai.defineFlow(
