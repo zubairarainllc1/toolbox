@@ -147,6 +147,7 @@ export default function XTweetGeneratorForm() {
                       max="1000"
                       placeholder="e.g., 50"
                       {...field}
+                      value={field.value ?? ''}
                       onChange={(e) => {
                         const value = e.target.value;
                         field.onChange(value === '' ? undefined : Number(value));
