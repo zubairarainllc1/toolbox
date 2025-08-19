@@ -1,9 +1,8 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BotMessageSquare, Cpu, Search, Sparkles, Zap } from 'lucide-react';
-import ToolSearch from '@/components/tool-search';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowRight, BotMessageSquare, Sparkles, Zap } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function Home() {
@@ -19,16 +18,13 @@ export default function Home() {
             <p className="mx-auto mt-6 max-w-[700px] text-lg text-muted-foreground md:text-xl">
               Your all-in-one AI toolkit for generating high-quality social media content, captions, hashtags, and more. Get started by finding the perfect tool below.
             </p>
-            <div className="mt-12 flex flex-col items-center gap-4">
-              <ToolSearch />
-               <Link href="/tools" className="group gradient-border-button">
-                  <span className="relative px-4 py-2 transition-all ease-in duration-75 bg-background rounded-md group-hover:bg-opacity-0">
-                    <span className="relative flex items-center text-foreground text-sm font-medium">
-                      Explore All Tools
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </span>
-                  </span>
-                </Link>
+            <div className="mt-12 flex justify-center">
+              <Link href="/tools">
+                <Button variant="outline" size="lg" className="border-primary/50 hover:bg-accent">
+                    Explore All Tools
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
