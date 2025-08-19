@@ -15,6 +15,7 @@ import { generateYoutubeTitle, GenerateYoutubeTitleInput } from "@/ai/flows/yout
 import { generateYoutubeContentIdeas, GenerateYoutubeContentIdeasInput } from "@/ai/flows/youtube-content-idea-generator";
 import { generateYoutubeViralHooks, GenerateYoutubeViralHooksInput } from "@/ai/flows/youtube-viral-hooks-generator";
 import { generateYoutubeDescription, GenerateYoutubeDescriptionInput } from "@/ai/flows/youtube-description-generator";
+import { generateXTweets, GenerateXTweetsInput } from "@/ai/flows/x-tweet-generator";
 
 
 const captionSchema = z.object({
@@ -64,6 +65,11 @@ const youtubeViralHooksSchema = z.object({
 const youtubeDescriptionSchema = z.object({
   title: z.string().min(10, 'Please provide a longer title.'),
   keywords: z.string().optional(),
+});
+
+const xTweetSchema = z.object({
+  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
+  context: z.string().optional(),
 });
 
 
@@ -333,6 +339,31 @@ export async function handleGenerateYoutubeDescription(
     console.error(error);
     return {
       message: 'Failed to generate description. Please try again later.',
+    };
+  }
+}
+
+export async function handleGenerateXTweets(prevState: any, formData: FormData) {
+  const validatedFields = xTweetSchema.safeParse({
+    topic: formData.get("topic"),
+    context: formData.get("context"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: validatedFields.error.errors.map((e) => e.message).join(", "),
+    };
+  }
+
+  try {
+    const result = await generateXTweets(validatedFields.data as GenerateXTweetsInput);
+    return {
+      tweets: result.tweets,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: "Failed to generate tweets. Please try again later.",
     };
   }
 }
