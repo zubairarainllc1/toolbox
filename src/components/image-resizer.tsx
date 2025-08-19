@@ -45,7 +45,7 @@ export default function ImageResizer() {
       
       const reader = new FileReader();
       reader.onload = (e) => {
-        const img = new Image();
+        const img = new window.Image();
         img.onload = () => {
           setWidth(img.width);
           setHeight(img.height);
@@ -88,7 +88,7 @@ export default function ImageResizer() {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const img = new Image();
+      const img = new window.Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
         canvas.width = width as number;
@@ -180,4 +180,3 @@ export default function ImageResizer() {
     </Card>
   );
 }
-
