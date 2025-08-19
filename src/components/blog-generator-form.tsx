@@ -23,10 +23,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { handleGenerateBlogPost } from '@/app/actions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Slider } from './ui/slider';
 
 const formSchema = z.object({
   topic: z
@@ -34,6 +34,7 @@ const formSchema = z.object({
     .min(10, 'Please enter a topic with at least 10 characters.'),
   keywords: z.string().optional(),
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']),
+  wordCount: z.number().min(600).max(2500),
 });
 
 export default function BlogGeneratorForm() {
@@ -48,6 +49,7 @@ export default function BlogGeneratorForm() {
       topic: '',
       keywords: '',
       tone: 'informative',
+      wordCount: 1000,
     },
   });
 
@@ -158,6 +160,28 @@ export default function BlogGeneratorForm() {
                 )}
                 />
             </div>
+            <FormField
+              control={form.control}
+              name="wordCount"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex justify-between items-center">
+                    <FormLabel>Word Count</FormLabel>
+                    <span className="text-sm font-medium text-muted-foreground">{field.value} words</span>
+                  </div>
+                  <FormControl>
+                    <Slider
+                      min={600}
+                      max={2500}
+                      step={50}
+                      value={[field.value]}
+                      onValueChange={(vals) => field.onChange(vals[0])}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button
               type="submit"
               disabled={isLoading}

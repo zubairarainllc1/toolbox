@@ -50,7 +50,7 @@ export interface Tool {
 export const tools: Tool[] = [
   // Productive Tools
   {
-    title: "Blog Post Generator",
+    title: "Advance Blog Generator",
     description: "Generate a full-length, SEO-friendly blog post from a topic.",
     href: "/tools/blog-generator",
     icon: PenSquare,

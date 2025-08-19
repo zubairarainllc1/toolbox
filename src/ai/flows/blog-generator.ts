@@ -15,6 +15,7 @@ const GenerateBlogPostInputSchema = z.object({
   topic: z.string().describe('The main topic or title for the blog post.'),
   keywords: z.string().optional().describe('Comma-separated keywords to include for SEO.'),
   tone: z.enum(['professional', 'casual', 'funny', 'informative', 'inspirational']).describe('The desired tone for the blog post.'),
+  wordCount: z.number().min(600).max(2500).describe('The desired word count for the blog post.'),
 });
 export type GenerateBlogPostInput = z.infer<typeof GenerateBlogPostInputSchema>;
 
@@ -35,10 +36,11 @@ const prompt = ai.definePrompt({
   output: { schema: GenerateBlogPostOutputSchema },
   prompt: `You are an expert content writer and SEO specialist. Generate a well-structured and engaging blog post based on the following details.
 
-The blog post should be at least 500 words long and formatted in Markdown. It must include a compelling title, an introduction, a body with multiple sections using headings (H2, H3), and a conclusion.
+The blog post should be approximately {{{wordCount}}} words long and formatted in Markdown. It must include a compelling title, an introduction, a body with multiple sections using headings (H2, H3), and a conclusion.
 
 Topic/Title: {{{topic}}}
 Tone: {{{tone}}}
+Word Count: {{{wordCount}}}
 {{#if keywords}}
 Incorporate the following keywords naturally throughout the text: {{{keywords}}}
 {{/if}}
