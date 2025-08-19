@@ -13,3 +13,4 @@ import '@/ai/flows/facebook-caption-generator';
 import '@/ai/flows/youtube-content-idea-generator';
 import '@/ai/flows/youtube-viral-hooks-generator';
 import '@/ai/flows/youtube-description-generator';
+import '@/ai/flows/x-tweet-generator';

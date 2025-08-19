@@ -122,6 +122,13 @@ export const tools: Tool[] = [
     icon: Hash,
     category: "X (Twitter)",
   },
+  {
+    title: "X (Tweet) Generator",
+    description: "Generate engaging tweets for your X profile.",
+    href: "/tools/x-tweet-generator",
+    icon: Twitter,
+    category: "X (Twitter)",
+  },
   // YouTube
   {
     title: "YouTube Title Generator",

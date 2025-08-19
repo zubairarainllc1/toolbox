@@ -57,8 +57,10 @@ export default function XTweetGeneratorForm() {
     try {
       const formData = new FormData();
       formData.append('topic', values.topic);
-      formData.append('context', values.context || '');
-
+      if (values.context) {
+        formData.append('context', values.context);
+      }
+      
       const response = await handleGenerateXTweets({}, formData);
       if(response.tweets) {
         setResult(response);
