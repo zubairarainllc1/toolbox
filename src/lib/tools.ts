@@ -92,6 +92,13 @@ export const tools: Tool[] = [
     icon: Sparkles,
     category: "Instagram",
   },
+  {
+    title: "Instagram Hashtag Generator",
+    description: "Generate viral hashtags to boost your reach.",
+    href: "/tools/instagram-hashtag-generator",
+    icon: Hash,
+    category: "Instagram",
+  },
   // Facebook
   {
     title: "Facebook Caption Generator",

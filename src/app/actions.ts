@@ -10,6 +10,7 @@ import { generateXContentIdeas } from "@/ai/flows/x-content-ideas-generator";
 import { generateYoutubeIdeas } from "@/ai/flows/youtube-idea-generator";
 import { generateYoutubeTitle } from "@/ai/flows/youtube-title-generator";
 import { generateTikTokVideoIdeas } from "@/ai/flows/tiktok-video-idea-generator";
+import { generateInstagramHashtags, GenerateInstagramHashtagsInput } from "@/ai/flows/instagram-hashtag-generator";
 import { z } from "zod";
 
 const captionSchema = z.object({
@@ -20,6 +21,12 @@ const instagramBioSchema = z.object({
   description: z.string().min(10, "Please provide a longer description."),
   keywords: z.string().min(3, "Please provide some keywords."),
   tone: z.string(),
+});
+
+const instagramHashtagSchema = z.object({
+  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
+  contentType: z.enum(['photo', 'video']),
+  quantity: z.coerce.number().min(1).max(30),
 });
 
 const facebookPostSchema = z.object({
@@ -88,6 +95,33 @@ export async function handleGenerateInstagramBio(prevState: any, formData: FormD
   } catch (error) {
     return {
       message: "Failed to generate bio. Please try again later.",
+    };
+  }
+}
+
+export async function handleGenerateInstagramHashtags(prevState: any, formData: FormData) {
+  const validatedFields = instagramHashtagSchema.safeParse({
+    topic: formData.get("topic"),
+    contentType: formData.get("contentType"),
+    quantity: formData.get("quantity"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: validatedFields.error.errors.map((e) => e.message).join(", "),
+    };
+  }
+
+  try {
+    const result = await generateInstagramHashtags(validatedFields.data as GenerateInstagramHashtagsInput);
+    const uniqueHashtags = Array.from(new Set(result.hashtags));
+    return {
+      hashtags: uniqueHashtags,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: "Failed to generate hashtags. Please try again later.",
     };
   }
 }
