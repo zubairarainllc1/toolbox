@@ -53,7 +53,6 @@ const twitterContentSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
   context: z.string().optional(),
   tweetsQuantity: z.coerce.number().min(1).max(10).default(5),
-  maxWords: z.coerce.number().min(5).max(1000).optional(),
 });
 
 const youtubeIdeasSchema = z.object({
@@ -247,7 +246,6 @@ export async function handleGenerateTwitterContent(prevState: any, formData: For
   const rawData = {
     topic: formData.get("topic"),
     context: formData.get("context"),
-    maxWords: formData.get("maxWords"),
     tweetsQuantity: 5,
   };
   

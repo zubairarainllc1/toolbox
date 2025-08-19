@@ -32,7 +32,6 @@ const formSchema = z.object({
     .string()
     .min(3, 'Please enter a topic with at least 3 characters.'),
   context: z.string().optional(),
-  maxWords: z.coerce.number().min(5).max(1000).optional(),
 });
 
 type TwitterResult = {
@@ -49,7 +48,6 @@ export default function XTweetGeneratorForm() {
     defaultValues: {
       topic: '',
       context: '',
-      maxWords: undefined,
     },
   });
 
@@ -62,10 +60,7 @@ export default function XTweetGeneratorForm() {
       if (values.context) {
         formData.append('context', values.context);
       }
-      if (values.maxWords) {
-        formData.append('maxWords', String(values.maxWords));
-      }
-
+      
       const response = await handleGenerateTwitterContent({}, formData);
       if(response.tweets) {
         setResult(response);
@@ -129,30 +124,6 @@ export default function XTweetGeneratorForm() {
                   <FormLabel>Additional Context (Optional)</FormLabel>
                   <FormControl>
                     <Textarea placeholder="Provide any extra details, links, or keywords to include." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="maxWords"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Max Words per Tweet (optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min="5"
-                      max="1000"
-                      placeholder="e.g., 50"
-                      {...field}
-                      value={field.value ?? ''}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        field.onChange(value === '' ? undefined : Number(value));
-                      }}
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
