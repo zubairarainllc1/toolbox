@@ -7,19 +7,17 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Download } from 'lucide-react';
 import { Label } from './ui/label';
+import { Slider } from './ui/slider';
 
-// Basic QR Code generation logic (no external library needed for simple cases)
-const generateQrCodeDataURL = (text: string): string => {
-  // This is a simplified implementation. For robust QR codes, a library is better.
-  // However, for a quick tool, we can use an external API.
-  // Using goqr.me API for simplicity and to avoid heavy client-side libraries.
+const generateQrCodeDataURL = (text: string, size: number): string => {
   if (!text) return '';
-  return `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(text)}`;
+  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}`;
 };
 
 export default function QrCodeGenerator() {
   const [text, setText] = useState('https://example.com');
   const [qrUrl, setQrUrl] = useState('');
+  const [size, setSize] = useState(256);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -27,7 +25,7 @@ export default function QrCodeGenerator() {
     setIsLoading(true);
     const handler = setTimeout(() => {
       if (text) {
-        const url = generateQrCodeDataURL(text);
+        const url = generateQrCodeDataURL(text, size);
         setQrUrl(url);
       } else {
         setQrUrl('');
@@ -38,7 +36,7 @@ export default function QrCodeGenerator() {
     return () => {
       clearTimeout(handler);
     };
-  }, [text]);
+  }, [text, size]);
 
   const handleDownload = () => {
     if (!qrUrl) {
@@ -76,11 +74,26 @@ export default function QrCodeGenerator() {
                 placeholder="e.g., https://google.com"
             />
         </div>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <Label htmlFor="size">QR Code Size</Label>
+            <span className="text-sm font-medium text-muted-foreground">{size}px</span>
+          </div>
+          <Slider
+            id="size"
+            min={100}
+            max={512}
+            step={1}
+            value={[size]}
+            onValueChange={(value) => setSize(value[0])}
+          />
+        </div>
 
         {qrUrl && (
           <div className="mt-4 p-4 bg-white rounded-md flex items-center justify-center">
             {isLoading ? (
-                <div className="h-64 w-64 bg-gray-200 animate-pulse rounded-md"></div>
+                <div style={{height: `${size}px`, width: `${size}px`}} className="bg-gray-200 animate-pulse rounded-md"></div>
             ) : (
                 <img src={qrUrl} alt="Generated QR Code" className="max-w-full h-auto" />
             )}
