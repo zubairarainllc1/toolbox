@@ -102,7 +102,7 @@ export const tools: Tool[] = [
   // Facebook
   {
     title: "Facebook Caption Generator",
-    description: "Create engaging captions to boost your post performance.",
+    description: "Create engaging captions for your Facebook posts.",
     href: "/tools/facebook-caption-generator",
     icon: Type,
     category: "Facebook",
@@ -116,17 +116,17 @@ export const tools: Tool[] = [
   },
   // X (Twitter)
   {
-    title: "X (Twitter) Hashtag Generator",
-    description: "Generate viral hashtags to boost your reach on X.",
-    href: "/tools/x-hashtag-generator",
-    icon: Hash,
-    category: "X (Twitter)",
-  },
-  {
     title: "X (Tweet) Generator",
     description: "Generate engaging tweets for your X profile.",
     href: "/tools/x-tweet-generator",
     icon: Type,
+    category: "X (Twitter)",
+  },
+  {
+    title: "X (Twitter) Hashtag Generator",
+    description: "Generate viral hashtags to boost your reach on X.",
+    href: "/tools/x-hashtag-generator",
+    icon: Hash,
     category: "X (Twitter)",
   },
   // YouTube
@@ -135,6 +135,13 @@ export const tools: Tool[] = [
     description: "Create catchy titles to increase your video views.",
     href: "/tools/youtube-title-generator",
     icon: Type,
+    category: "YouTube",
+  },
+  {
+    title: "YouTube Content Idea Generator",
+    description: "Get viral video ideas for your YouTube channel.",
+    href: "/tools/youtube-content-idea-generator",
+    icon: Lightbulb,
     category: "YouTube",
   },
   // TikTok
