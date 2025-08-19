@@ -12,6 +12,8 @@ import { generateXHashtags } from "@/ai/flows/x-hashtag-generator";
 import { generateXContentIdeas } from "@/ai/flows/x-content-ideas-generator";
 import { generateYoutubeIdeas } from "@/ai/flows/youtube-idea-generator";
 import { generateYoutubeTitle } from "@/ai/flows/youtube-title-generator";
+import { generateTikTokHashtags } from "@/ai/flows/tiktok-hashtag-generator";
+import { generateTikTokVideoIdeas } from "@/ai/flows/tiktok-video-idea-generator";
 import { z } from "zod";
 
 const hashtagSchema = z.object({
@@ -42,6 +44,10 @@ const youtubeIdeasSchema = z.object({
 
 const youtubeTitleSchema = z.object({
   description: z.string().min(10, "Please provide a longer description."),
+});
+
+const tiktokVideoIdeasSchema = z.object({
+  topic: z.string().min(3, "Please provide a topic."),
 });
 
 
@@ -253,6 +259,52 @@ export async function handleGenerateYoutubeTitle(prevState: any, formData: FormD
   } catch (error) {
     return {
       message: "Failed to generate titles. Please try again later.",
+    };
+  }
+}
+
+export async function handleGenerateTikTokHashtags(prevState: any, formData: FormData) {
+  const validatedFields = hashtagSchema.safeParse({
+    description: formData.get("description"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: validatedFields.error.errors.map((e) => e.message).join(", "),
+    };
+  }
+
+  try {
+    const result = await generateTikTokHashtags(validatedFields.data.description);
+    return {
+      hashtags: result.hashtags,
+    };
+  } catch (error) {
+    return {
+      message: "Failed to generate hashtags. Please try again later.",
+    };
+  }
+}
+
+export async function handleGenerateTikTokVideoIdeas(prevState: any, formData: FormData) {
+  const validatedFields = tiktokVideoIdeasSchema.safeParse({
+    topic: formData.get("topic"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: validatedFields.error.errors.map((e) => e.message).join(", "),
+    };
+  }
+
+  try {
+    const result = await generateTikTokVideoIdeas(validatedFields.data.topic);
+    return {
+      ideas: result.ideas,
+    };
+  } catch (error) {
+    return {
+      message: "Failed to generate ideas. Please try again later.",
     };
   }
 }

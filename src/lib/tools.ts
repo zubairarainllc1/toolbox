@@ -12,19 +12,35 @@ import {
   Hash,
   Lightbulb,
 } from "lucide-react";
+import * as React from 'react';
+
+// Custom TikTok Icon
+const TikTokIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
+  React.createElement('svg', {
+    xmlns: "http://www.w3.org/2000/svg",
+    viewBox: "0 0 24 24",
+    fill: "currentColor",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    ...props
+  }, React.createElement('path', { d: "M16.17 6.17a4.004 4.004 0 0 0-3.34-3.34V16a4 4 0 1 1-4-4h2.5" }));
+
 
 export type ToolCategory =
   | "Productive Tools"
   | "Instagram"
   | "Facebook"
   | "X (Twitter)"
-  | "YouTube";
+  | "YouTube"
+  | "TikTok";
 
 export interface Tool {
   title: string;
   description: string;
   href: string;
-  icon: LucideIcon;
+  icon: LucideIcon | React.FC<React.SVGProps<SVGSVGElement>>;
   category: ToolCategory;
   comingSoon?: boolean;
 }
@@ -112,6 +128,21 @@ export const tools: Tool[] = [
     icon: Type,
     category: "YouTube",
   },
+  // TikTok
+  {
+    title: "TikTok Hashtag Generator",
+    description: "Find trending and relevant hashtags for your TikTok videos.",
+    href: "/tools/tiktok-hashtag-generator",
+    icon: Hash,
+    category: "TikTok",
+  },
+  {
+    title: "TikTok Video Idea Generator",
+    description: "Get viral video ideas for your TikTok channel.",
+    href: "/tools/tiktok-video-idea-generator",
+    icon: Lightbulb,
+    category: "TikTok",
+  },
 ];
 
 export const toolCategories: ToolCategory[] = [
@@ -120,12 +151,14 @@ export const toolCategories: ToolCategory[] = [
   "Facebook",
   "X (Twitter)",
   "YouTube",
+  "TikTok",
 ];
 
-export const categoryIcons: Record<ToolCategory, LucideIcon> = {
+export const categoryIcons: Record<ToolCategory, LucideIcon | React.FC<React.SVGProps<SVGSVGElement>>> = {
   "Productive Tools": Sparkles,
   Instagram: Instagram,
   Facebook: Facebook,
   "X (Twitter)": Twitter,
   YouTube: Youtube,
+  TikTok: TikTokIcon,
 };

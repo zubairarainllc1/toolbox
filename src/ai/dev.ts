@@ -10,3 +10,5 @@ import '@/ai/flows/x-hashtag-generator';
 import '@/ai/flows/x-content-ideas-generator';
 import '@/ai/flows/youtube-idea-generator';
 import '@/ai/flows/youtube-title-generator';
+import '@/ai/flows/tiktok-hashtag-generator';
+import '@/ai/flows/tiktok-video-idea-generator';
