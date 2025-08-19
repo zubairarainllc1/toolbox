@@ -13,8 +13,8 @@ import { generateFacebookCaptions, GenerateFacebookCaptionsInput } from "@/ai/fl
 import { generateXHashtags, GenerateXHashtagsInput } from "@/ai/flows/x-hashtag-generator";
 import { generateYoutubeTitle, GenerateYoutubeTitleInput } from "@/ai/flows/youtube-title-generator";
 import { generateYoutubeContentIdeas, GenerateYoutubeContentIdeasInput } from "@/ai/flows/youtube-content-idea-generator";
-import { generateXTweets, GenerateXTweetsInput } from "@/ai/flows/x-tweet-generator";
 import { generateYoutubeViralHooks, GenerateYoutubeViralHooksInput } from "@/ai/flows/youtube-viral-hooks-generator";
+import { generateYoutubeDescription, GenerateYoutubeDescriptionInput } from "@/ai/flows/youtube-description-generator";
 
 
 const captionSchema = z.object({
@@ -61,9 +61,9 @@ const youtubeViralHooksSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
 });
 
-const xTweetSchema = z.object({
-  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
-  context: z.string().optional(),
+const youtubeDescriptionSchema = z.object({
+  title: z.string().min(10, 'Please provide a longer title.'),
+  keywords: z.string().optional(),
 });
 
 
@@ -313,29 +313,26 @@ export async function handleGenerateYoutubeViralHooks(prevState: any, formData: 
   }
 }
 
-export async function handleGenerateXTweets(prevState: any, formData: FormData) {
-  const values = {
-    topic: formData.get('topic'),
-    context: formData.get('context'),
-  };
-  
-  const validatedFields = xTweetSchema.safeParse(values);
+export async function handleGenerateYoutubeDescription(
+  input: GenerateYoutubeDescriptionInput
+): Promise<{ description?: string; message?: string }> {
+  const validatedFields = youtubeDescriptionSchema.safeParse(input);
 
   if (!validatedFields.success) {
     return {
-      message: validatedFields.error.errors.map((e) => e.message).join(", "),
+      message: validatedFields.error.errors.map((e) => e.message).join(', '),
     };
   }
 
   try {
-    const result = await generateXTweets(validatedFields.data as GenerateXTweetsInput);
+    const result = await generateYoutubeDescription(validatedFields.data);
     return {
-      tweets: result.tweets,
+      description: result.description,
     };
   } catch (error) {
     console.error(error);
     return {
-      message: "Failed to generate tweets. Please try again later.",
+      message: 'Failed to generate description. Please try again later.',
     };
   }
 }

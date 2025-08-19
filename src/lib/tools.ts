@@ -116,13 +116,6 @@ export const tools: Tool[] = [
   },
   // X (Twitter)
   {
-    title: "X (Tweet) Generator",
-    description: "Generate engaging tweets for your X profile.",
-    href: "/tools/x-tweet-generator",
-    icon: Type,
-    category: "X (Twitter)",
-  },
-  {
     title: "X (Twitter) Hashtag Generator",
     description: "Generate viral hashtags to boost your reach on X.",
     href: "/tools/x-hashtag-generator",
@@ -149,6 +142,13 @@ export const tools: Tool[] = [
     description: "Generate catchy hooks to make your videos go viral.",
     href: "/tools/youtube-viral-hooks-generator",
     icon: Sparkles,
+    category: "YouTube",
+  },
+  {
+    title: "YouTube Description Generator",
+    description: "Generate SEO-friendly descriptions for your videos.",
+    href: "/tools/youtube-description-generator",
+    icon: FileText,
     category: "YouTube",
   },
   // TikTok
