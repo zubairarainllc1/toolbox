@@ -101,6 +101,13 @@ export const tools: Tool[] = [
   },
   // Facebook
   {
+    title: "Facebook Caption Generator",
+    description: "Create engaging captions to boost your post performance.",
+    href: "/tools/facebook-caption-generator",
+    icon: Type,
+    category: "Facebook",
+  },
+  {
     title: "Facebook Hashtag Generator",
     description: "Generate viral hashtags to boost your reach.",
     href: "/tools/facebook-hashtag-generator",

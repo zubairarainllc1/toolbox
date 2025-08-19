@@ -13,6 +13,8 @@ import { generateInstagramHashtags, GenerateInstagramHashtagsInput } from "@/ai/
 import { generateFacebookHashtags, GenerateFacebookHashtagsInput } from "@/ai/flows/facebook-hashtag-generator";
 import { z } from "zod";
 import { generateInstagramCaptions, GenerateInstagramCaptionsInput } from "@/ai/flows/generate-instagram-captions";
+import { generateFacebookCaptions, GenerateFacebookCaptionsInput } from "@/ai/flows/facebook-caption-generator";
+
 
 const captionSchema = z.object({
   topic: z.string().min(3, "Please provide a longer topic."),
@@ -33,6 +35,11 @@ const facebookHashtagSchema = z.object({
 });
 
 const instagramCaptionSchema = z.object({
+  topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
+  includeEmojis: z.boolean().optional(),
+});
+
+const facebookCaptionSchema = z.object({
   topic: z.string().min(3, 'Please enter a topic with at least 3 characters.'),
   includeEmojis: z.boolean().optional(),
 });
@@ -177,6 +184,32 @@ export async function handleGenerateInstagramCaptions(prevState: any, formData: 
     };
   }
 }
+
+export async function handleGenerateFacebookCaptions(prevState: any, formData: FormData) {
+  const validatedFields = facebookCaptionSchema.safeParse({
+    topic: formData.get("topic"),
+    includeEmojis: formData.get("includeEmojis") === 'on',
+  });
+
+  if (!validatedFields.success) {
+    return {
+      message: validatedFields.error.errors.map((e) => e.message).join(", "),
+    };
+  }
+
+  try {
+    const result = await generateFacebookCaptions(validatedFields.data as GenerateFacebookCaptionsInput);
+    return {
+      captions: result.captions,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: "Failed to generate captions. Please try again later.",
+    };
+  }
+}
+
 
 export async function handleGenerateXContentIdeas(prevState: any, formData: FormData) {
   const validatedFields = xContentIdeasSchema.safeParse({
