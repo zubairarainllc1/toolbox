@@ -47,7 +47,7 @@ const prompt = ai.definePrompt({
   output: { schema: GenerateInstagramCaptionsOutputSchema },
   prompt: `You are a viral Instagram marketing expert. Generate {{{quantity}}} unique and engaging Instagram captions for a {{{contentType}}} post about "{{{topic}}}".
 
-The captions should be creative, relevant, and encourage interaction.
+The captions should be creative, relevant, and encourage interaction. Do not include any emojis or hashtags.
 
 Return the captions as a JSON array of strings. Do not include any intro or explanation text. Just return the JSON.`,
 });
