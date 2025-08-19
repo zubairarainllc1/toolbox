@@ -15,7 +15,7 @@ const GenerateYoutubeIdeasInputSchema = z.string().describe('A topic or niche fo
 export type GenerateYoutubeIdeasInput = z.infer<typeof GenerateYoutubeIdeasInputSchema>;
 
 const GenerateYoutubeIdeasOutputSchema = z.object({
-  ideas: z.array(z.string()).describe('An array of creative YouTube video ideas.'),
+  ideas: z.array(z.string()).describe('An array of 5 creative YouTube video ideas.'),
 });
 export type GenerateYoutubeIdeasOutput = z.infer<typeof GenerateYoutubeIdeasOutputSchema>;
 
@@ -27,7 +27,7 @@ const prompt = ai.definePrompt({
   name: 'generateYoutubeIdeasPrompt',
   input: {schema: GenerateYoutubeIdeasInputSchema},
   output: {schema: GenerateYoutubeIdeasOutputSchema},
-  prompt: `You are a YouTube content strategist. Generate a list of 5 creative and engaging video ideas for a channel focused on the following topic: {{{$input}}}
+  prompt: `Generate a list of 5 creative and engaging YouTube video ideas for a channel focused on the following topic: {{{$input}}}
 
   The ideas should be catchy and have potential for high viewership.
 
