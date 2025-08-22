@@ -5,13 +5,14 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Lock, User, Eye, EyeOff, LayoutDashboard } from 'lucide-react';
+import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import AdminDashboard from '@/components/admin-dashboard';
 
 // Schemas for validation
 const setPasswordSchema = z.object({
@@ -29,20 +30,6 @@ const loginSchema = z.object({
 
 type SetPasswordForm = z.infer<typeof setPasswordSchema>;
 type LoginForm = z.infer<typeof loginSchema>;
-
-// Mock admin dashboard
-const AdminDashboard = ({ onLogout }: { onLogout: () => void }) => (
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center gap-2"><LayoutDashboard /> Admin Dashboard</CardTitle>
-      <CardDescription>Welcome to the admin area.</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <p>Here you can manage your application settings.</p>
-      <Button onClick={onLogout} variant="outline" className="mt-6">Logout</Button>
-    </CardContent>
-  </Card>
-);
 
 export default function AdminPage() {
   const [pageState, setPageState] = useState<'loading' | 'setup' | 'login' | 'dashboard'>('loading');
@@ -66,14 +53,14 @@ export default function AdminPage() {
       setPageState('setup');
     }
   }, []);
-
+  
   const handleSetPassword = (data: SetPasswordForm) => {
     localStorage.setItem('zubair-admin-password', data.password);
     setStoredPassword(data.password);
     setPageState('login');
     toast({ title: 'Success', description: 'Password has been set. Please log in.' });
   };
-
+  
   const handleLogin = (data: LoginForm) => {
     if (data.username === 'wbtool@1' && data.password === storedPassword) {
       sessionStorage.setItem('admin-logged-in', 'true');
@@ -92,7 +79,7 @@ export default function AdminPage() {
   
   useEffect(() => {
       const isLoggedIn = sessionStorage.getItem('admin-logged-in');
-      if (isLoggedIn && storedPassword) {
+      if (isLoggedIn === 'true' && storedPassword) {
           setPageState('dashboard');
       }
   }, [storedPassword]);
@@ -103,9 +90,7 @@ export default function AdminPage() {
   
   if(pageState === 'dashboard') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
         <AdminDashboard onLogout={handleLogout} />
-      </div>
     );
   }
 
@@ -174,14 +159,14 @@ export default function AdminPage() {
                 <Label htmlFor="login-username">Username</Label>
                  <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input id="login-username" placeholder="wbtool@1" {...loginForm.register('username')} className="pl-10" />
+                  <Input id="login-username" placeholder="Enter your username" {...loginForm.register('username')} className="pl-10" />
                 </div>
                 {loginForm.formState.errors.username && <p className="text-sm text-destructive">{loginForm.formState.errors.username.message}</p>}
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="login-password">Password</Label>
-                  <Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <Link href="#" tabIndex={-1} className="text-sm text-muted-foreground hover:text-primary transition-colors cursor-not-allowed opacity-50">
                     Forgot password?
                   </Link>
                 </div>
