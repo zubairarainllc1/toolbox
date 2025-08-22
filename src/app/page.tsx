@@ -1,7 +1,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BotMessageSquare, Sparkles, Zap, Instagram, Youtube, Facebook, Palette, Briefcase } from 'lucide-react';
+import { ArrowRight, BotMessageSquare, Sparkles, Zap, Instagram, Youtube, Facebook, Palette, Briefcase, Twitter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Home() {
@@ -34,12 +34,12 @@ export default function Home() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
-                Why Choose Toolbox?
-              </div>
               <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">
-                Work Smarter, Not Harder
+                Why Choose Toolbox?
               </h2>
+              <h3 className="font-headline text-2xl font-bold tracking-tighter sm:text-4xl text-muted-foreground">
+                Work Smarter, Not Harder
+              </h3>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 Our AI-powered tools are designed to streamline your workflow and supercharge your creativity.
               </p>
@@ -90,7 +90,7 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="mx-auto grid max-w-5xl items-stretch gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 mt-12">
+          <div className="mx-auto grid max-w-5xl items-stretch gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-4 mt-12">
             <Card className="flex flex-col justify-center items-center text-center p-6">
               <Instagram className="h-10 w-10 mb-4 text-primary" />
               <h3 className="text-lg font-bold font-headline">Instagram</h3>
@@ -105,6 +105,11 @@ export default function Home() {
               <Facebook className="h-10 w-10 mb-4 text-primary" />
               <h3 className="text-lg font-bold font-headline">Facebook</h3>
               <p className="text-sm text-muted-foreground">Captions & Hashtags</p>
+            </Card>
+            <Card className="flex flex-col justify-center items-center text-center p-6">
+              <Twitter className="h-10 w-10 mb-4 text-primary" />
+              <h3 className="text-lg font-bold font-headline">X (Twitter)</h3>
+              <p className="text-sm text-muted-foreground">Tweet Generation & More</p>
             </Card>
           </div>
         </div>
@@ -203,5 +208,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
