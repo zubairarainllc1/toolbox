@@ -5,12 +5,13 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Lock, User, Eye, EyeOff, LayoutDashboard } from 'lucide-react';
+import Link from 'next/link';
 
 // Schemas for validation
 const setPasswordSchema = z.object({
@@ -173,12 +174,17 @@ export default function AdminPage() {
                 <Label htmlFor="login-username">Username</Label>
                  <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input id="login-username" defaultValue="wbtool@1" {...loginForm.register('username')} className="pl-10" />
+                  <Input id="login-username" placeholder="wbtool@1" {...loginForm.register('username')} className="pl-10" />
                 </div>
                 {loginForm.formState.errors.username && <p className="text-sm text-destructive">{loginForm.formState.errors.username.message}</p>}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="login-password">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="login-password">Password</Label>
+                  <Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                    Forgot password?
+                  </Link>
+                </div>
                 <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input id="login-password" type={showPassword ? 'text' : 'password'} {...loginForm.register('password')} className="pl-10 pr-10" />
