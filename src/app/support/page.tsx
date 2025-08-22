@@ -67,7 +67,7 @@ export default function SupportPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Send us an email at <a href="mailto:support@toolbox.com" className="text-primary hover:underline">support@toolbox.com</a> for detailed inquiries.
+                Send us an email at <a href="mailto:codexignllc@gmail.com" className="text-primary hover:underline">codexignllc@gmail.com</a> for detailed inquiries.
               </p>
             </CardContent>
           </Card>

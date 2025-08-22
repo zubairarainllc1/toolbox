@@ -37,7 +37,7 @@ export default function TermsAndConditionsPage() {
           <p>These Terms shall be governed and construed in accordance with the laws of the jurisdiction in which Codexign LLC is located, without regard to its conflict of law provisions.</p>
           
           <h2>9. Contact Us</h2>
-          <p>If you have any questions about these Terms, please contact us at: support@toolbox.com</p>
+          <p>If you have any questions about these Terms, please contact us at: codexignllc@gmail.com</p>
         </div>
       </div>
     </div>
