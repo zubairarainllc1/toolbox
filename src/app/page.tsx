@@ -37,9 +37,6 @@ export default function Home() {
               <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">
                 Why Choose Toolbox?
               </h2>
-              <h3 className="font-headline text-2xl font-bold tracking-tighter sm:text-4xl text-muted-foreground">
-                Work Smarter, Not Harder
-              </h3>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 Our AI-powered tools are designed to streamline your workflow and supercharge your creativity.
               </p>
