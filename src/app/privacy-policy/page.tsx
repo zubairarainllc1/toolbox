@@ -5,7 +5,7 @@ export default function PrivacyPolicyPage() {
       <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
         <div className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none">
           <h1>Privacy Policy</h1>
-          <p className="text-muted-foreground">Last Updated: July 29, 2024</p>
+          <p className="text-muted-foreground">Last Updated: Aug, 23, 2025</p>
           
           <p>Codexign LLC ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how your personal information is collected, used, and disclosed by Toolbox.</p>
 

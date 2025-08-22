@@ -5,7 +5,7 @@ export default function TermsAndConditionsPage() {
       <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
         <div className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert max-w-none">
           <h1>Terms and Conditions</h1>
-          <p className="text-muted-foreground">Last Updated: July 29, 2024</p>
+          <p className="text-muted-foreground">Last Updated: Aug, 23, 2025</p>
 
           <h2>1. Agreement to Terms</h2>
           <p>By using our website and tools (the "Service"), you agree to be bound by these Terms and Conditions. If you disagree with any part of the terms, then you do not have permission to access the Service.</p>
